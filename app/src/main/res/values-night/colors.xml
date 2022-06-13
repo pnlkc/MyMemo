@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFF</color>
+<!--  커스텀 색상  -->
+    <color name="deleteBtn">#A1A1A1</color>
+    <color name="dashLine">#80A1A1A1</color>
+    <color name="addBtn">#6a4a4c</color>
+    <color name="backBtn">#B58D8F</color>
+    <color name="clearBtn">#6a4a4c</color>
+    <color name="edit_text_cursor">#B58D8F</color>
+    <color name="divisionLine">#4DFFFFFF</color>
+    <color name="addBtnComponent">#FFFFFFFF</color>
+    <color name="textHighlight">#877576</color>
+    <color name="checkCircleBtnBG">#CCDCD9D9</color>
+
+    <color name="memoEditBg">#332D2D</color>
+    <color name="memoEditText">#FFFFFF</color>
+    <color name="memoEditIconBtn">#FFFFFF</color>
+    <color name="memoEditLabelBg">#4e4545</color>
+    <color name="memoEditLabelRipple">#5c5151</color>
+    <color name="memoEditLabelText">#FFFFFF</color>
+
+    <color name="memoListBg">#332D2D</color>
+    <color name="memoListText">#CCFFFFFF</color>
+
+    <color name="memoItemBg">#4C3638</color>
+    <color name="memoItemText">#B3FFFFFF</color>
+
+    <color name="snackbarText">#FFFFFF</color>
+    <color name="snackbarActionText">#552B1E</color>
+    <color name="snackbarBg">#AA8073</color>
+
+    <color name="searchBtn">#CCFFFFFF</color>
+    <color name="searchEditText">#FFFFFF</color>
+    <color name="searchHighLightText">#FF000000</color>
+    <color name="searchHighLightTextBg">#F7DE34</color>
+
+    <color name="drawerBtn">#CCFFFFFF</color>
+    <color name="drawer_title_text">#CCFFFFFF</color>
+    <color name="drawer_main_color">#CCDCD9D9</color>
+    <color name="drawer_bg">#332D2D</color>
+    <color name="drawer_divisionLine">#6a4a4c</color>
+    <color name="drawer_edit_text_hint">#CCC1C0C0</color>
+    <color name="drawer_ripple">#5C5757</color>
+    <color name="drawer_selected_ripple">#332D2D</color>
+    <color name="drawer_selected_bar">#6a4a4c</color>
+    <color name="drawer_selected_bg">#4D705B5B</color>
+
+</resources>

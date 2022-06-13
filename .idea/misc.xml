@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.168" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/add_btg_ripple.xml" value="0.168" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/add_btn_bg.xml" value="0.168" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/add_time_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/all_memo_icon.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/back_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/cancel_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/check_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/dash_line.xml" value="0.168" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/drawer_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/drawer_layout_ripple.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/drawer_selected_bg.xml" value="0.2" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/drawer_unselected_bg.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/edit_memo_label_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/edit_text_cursor.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/edit_text_outline.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.168" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_add_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_add_location_24.xml" value="0.175" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.168" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_article_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_bookmark_border_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.168" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_check_circle_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_check_circle_outline_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_more_time_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_search_off_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_baseline_star_border_24.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/ic_launcher_background.xml" value="0.168" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/label_add_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/label_background.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/memo_add_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/search_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/activity_main.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/custom_snackbar.xml" value="0.5" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/drawer_item.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_dialog.xml" value="0.38385416666666666" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_drawer.xml" value="0.33" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_memo_edit.xml" value="0.33" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_memo_list.xml" value="0.2814814814814815" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_memo_search.xml" value="0.3314814814814815" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_select_label.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_drawer.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_label.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_list.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_select_label.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/label_item.xml" value="0.38385416666666666" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/list_item.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/memo_item_view.xml" value="0.30185185185185187" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/search_item.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/select_label_item.xml" value="0.33" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/menu/app_bar_menu.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable/add_btg_ripple.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable/add_btn_bg.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable/add_btn_selector.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable/dash_line.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1675" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/layout/activity_main.xml" value="0.2675925925925926" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/layout/fragment_memo_add.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/layout/fragment_memo_edit.xml" value="0.2675925925925926" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/layout/fragment_memo_list.xml" value="0.3768518518518518" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/layout/fragment_memolist.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/RoomPracticeOne/app/src/main/res/layout/memo_item_view.xml" value="0.3768518518518518" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

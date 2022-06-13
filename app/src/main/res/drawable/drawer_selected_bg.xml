@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/drawer_selected_ripple">
+
+    <item android:id="@android:id/mask">
+        <shape>
+            <solid android:color="@color/drawer_selected_ripple" />
+        </shape>
+    </item>
+
+    <item android:id="@android:id/background">
+        <shape>
+            <solid android:color="@color/drawer_selected_bg" />
+        </shape>
+    </item>
+
+    <item android:gravity="start">
+        <shape android:shape="rectangle">
+            <size android:width="2dp"/>
+            <solid android:color="@color/drawer_selected_bar" />
+        </shape>
+    </item>
+
+</ripple>

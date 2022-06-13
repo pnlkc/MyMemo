@@ -1,0 +1,49 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.MyMemo" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" >@color/memoListBg</item>
+        <item name="android:navigationBarColor">@color/memoListBg</item>
+        <!-- Customize your theme here. -->
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:windowBackground">@color/memoListBg</item>
+        <item name="android:textColorHighlight">@color/textHighlight</item>
+        <item name="colorAccent">@color/edit_text_cursor</item>
+        <item name="colorControlActivated">@color/edit_text_cursor</item>
+    </style>
+
+    <style name="ToolbarExpandedTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:fontFamily">@font/gmarket_sans_bold</item>
+        <item name="android:textColor">@color/memoListText</item>
+        <item name="android:textSize">35sp</item>
+    </style>
+
+    <style name="ToolbarCollapseTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:fontFamily">@font/gmarket_sans_bold</item>
+        <item name="android:textColor">@color/memoListText</item>
+    </style>
+
+    <style name="fullscreen_dialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/memoListBg</item>
+    </style>
+
+    <style name="dialog_animation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_left</item>
+    </style>
+
+</resources>

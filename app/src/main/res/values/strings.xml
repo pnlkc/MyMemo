@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MyMemo</string>
+    <string name="drawer_all_memo">모든 메모</string>
+    <string name="add_label_edit_text_hint">라벨 이름을 입력하세요</string>
+    <string name="search_memo">메모 검색</string>
+    <string name="edit_memo_edit_text_hint">메모</string>
+    <string name="edit_memo_title_hint">제목</string>
+    <string name="search_label">라벨 검색</string>
+    <string name="add_label">라벨 추가하기</string>
+    <string name="label_name">라벨 이름</string>
+</resources>
