@@ -2,12 +2,15 @@ package com.example.mymemo.recyclerview_edit_label
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mymemo.databinding.ItemEditLabelBinding
-import com.example.mymemo.util.DiffUtilItemCallback
+import com.example.mymemo.util.CustomDiffUtil
 
 class EditLabelAdapter(private var recyclerViewInterface: IEditLabel) :
-    ListAdapter<String, EditLabelViewHolder>(DiffUtilItemCallback.stringDiffUtil) {
+    RecyclerView.Adapter<EditLabelViewHolder>() {
+
+    private val labelList = mutableListOf<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditLabelViewHolder {
         val binding =
@@ -16,6 +19,21 @@ class EditLabelAdapter(private var recyclerViewInterface: IEditLabel) :
     }
 
     override fun onBindViewHolder(holder: EditLabelViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(labelList[position])
+    }
+
+    override fun getItemCount(): Int = labelList.size
+
+    fun setData(label: MutableList<String>) {
+        label.let {
+            val diffCallback = CustomDiffUtil.DiffUtilCallback(labelList, label)
+            val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+            labelList.run {
+                clear()
+                addAll(label)
+                diffResult.dispatchUpdatesTo(this@EditLabelAdapter)
+            }
+        }
     }
 }

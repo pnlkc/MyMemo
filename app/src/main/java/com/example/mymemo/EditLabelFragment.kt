@@ -3,9 +3,6 @@ package com.example.mymemo
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -68,7 +65,7 @@ class EditLabelFragment : Fragment(), IEditLabel {
         editLabelAdapter = EditLabelAdapter(this)
         binding.editLabelRecyclerView.adapter = editLabelAdapter
         binding.editLabelRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        editLabelAdapter.submitList(memoViewModel.labelList.value)
+        editLabelAdapter.setData(memoViewModel.labelList.value!!)
     }
 
     // 엔터누르면 실행되는 기능
@@ -88,7 +85,7 @@ class EditLabelFragment : Fragment(), IEditLabel {
         if (label.isNotBlank() && !memoViewModel.labelList.value!!.contains(label)) {
             memoViewModel.labelList.value!!.add(label)
             memoViewModel.labelList.value = memoViewModel.labelList.value!!.sorted().toMutableList()
-            editLabelAdapter.submitList(memoViewModel.labelList.value!!)
+            editLabelAdapter.setData(memoViewModel.labelList.value!!)
             saveLabelList()
             Toast.makeText(requireContext(),
                 "\"$label\" 라벨이 추가되었습니다", Toast.LENGTH_SHORT).show()

@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.mymemo.databinding.ItemListBinding
 import com.example.mymemo.room.MemoEntity
-import com.example.mymemo.util.DiffUtilItemCallback
+import com.example.mymemo.util.CustomDiffUtil
 
 class ListAdapter(private var recyclerViewInterface: IListRecyclerVIew) :
-    ListAdapter<MemoEntity, ListViewHolder>(DiffUtilItemCallback.memoDiffUtil) {
+    ListAdapter<MemoEntity, ListViewHolder>(CustomDiffUtil.memoDiffUtilItemCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         val binding =

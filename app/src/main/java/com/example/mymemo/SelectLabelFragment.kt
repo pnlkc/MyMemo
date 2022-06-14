@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -69,7 +68,7 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
         binding.selectLabelRecyclerView.adapter = selectLabelAdapter
         binding.selectLabelRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        selectLabelAdapter.submitList(memoViewModel.labelList.value!!)
+        selectLabelAdapter.setData(memoViewModel.labelList.value!!)
 
         binding.backButton.setOnClickListener {
             removeFragment()
@@ -121,7 +120,7 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
             memoViewModel.selectedMemo.value!!.label.add(label)
             memoViewModel.labelList.value!!.add(label)
             memoViewModel.labelList.value = memoViewModel.labelList.value!!.sorted().toMutableList()
-            selectLabelAdapter.submitList(memoViewModel.labelList.value!!)
+            selectLabelAdapter.setData(memoViewModel.labelList.value!!)
             saveLabelList()
             Toast.makeText(requireContext(),
                 "\"$label\" 라벨이 추가되었습니다", Toast.LENGTH_SHORT).show()

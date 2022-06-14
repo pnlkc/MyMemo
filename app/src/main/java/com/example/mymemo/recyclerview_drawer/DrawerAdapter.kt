@@ -1,13 +1,18 @@
 package com.example.mymemo.recyclerview_drawer
 
+import android.text.method.TextKeyListener.clear
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mymemo.databinding.ItemDrawerBinding
-import com.example.mymemo.util.DiffUtilItemCallback
+import com.example.mymemo.recyclerview_edit_memo_label.LabelViewHolder
+import com.example.mymemo.util.CustomDiffUtil
+import java.util.Collections.addAll
 
 class DrawerAdapter(private var recyclerViewInterface: IDrawerRecyclerView) :
-    ListAdapter<String, DrawerViewHolder>(DiffUtilItemCallback.stringDiffUtil) {
+    ListAdapter<String, DrawerViewHolder>(CustomDiffUtil.stringDiffUtilItemCallback) {
 
     private var selectedLabel: String? = null
 

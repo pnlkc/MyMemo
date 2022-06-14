@@ -2,14 +2,18 @@ package com.example.mymemo.recyclerview_select_label
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mymemo.databinding.ItemSelectLabelBinding
-import com.example.mymemo.util.DiffUtilItemCallback
+import com.example.mymemo.util.CustomDiffUtil
 
 class SelectLabelAdapter(
     private val memoLabelList: MutableList<String>,
     private val recyclerViewInterface: ISelectLabel
-) : ListAdapter<String, SelectLabelViewHolder>(DiffUtilItemCallback.stringDiffUtil) {
+) : RecyclerView.Adapter<SelectLabelViewHolder>() {
+
+    private val labelList = mutableListOf<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectLabelViewHolder {
         val binding =
@@ -18,6 +22,21 @@ class SelectLabelAdapter(
     }
 
     override fun onBindViewHolder(holder: SelectLabelViewHolder, position: Int) {
-        holder.bind(getItem(position), memoLabelList)
+        holder.bind(labelList[position], memoLabelList)
+    }
+
+    override fun getItemCount(): Int = labelList.size
+
+    fun setData(label: MutableList<String>) {
+        label.let {
+            val diffCallback = CustomDiffUtil.DiffUtilCallback(labelList, label)
+            val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+            labelList.run {
+                clear()
+                addAll(label)
+                diffResult.dispatchUpdatesTo(this@SelectLabelAdapter)
+            }
+        }
     }
 }
