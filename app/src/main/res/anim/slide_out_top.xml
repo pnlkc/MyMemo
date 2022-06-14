@@ -3,12 +3,6 @@
     <translate
         android:duration="200"
         android:fromYDelta="0%"
-        android:toYDelta="20%" >
+        android:toYDelta="10%">
     </translate>
-
-    <alpha
-        android:duration="200"
-        android:fromAlpha="0.5"
-        android:toAlpha="0.0">
-    </alpha>
 </set>

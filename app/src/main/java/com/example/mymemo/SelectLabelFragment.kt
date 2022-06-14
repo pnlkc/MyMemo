@@ -2,6 +2,8 @@ package com.example.mymemo
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -19,10 +22,6 @@ import com.example.mymemo.recyclerview_select_label.SelectLabelAdapter
 import com.example.mymemo.util.ConstData
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class SelectLabelFragment : Fragment(), ISelectLabel {
 
@@ -34,22 +33,41 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
 
     private val memoViewModel: MemoViewModel by activityViewModels()
 
+    // OnBackPressedCallback (뒤로가기 기능) 객체 선언
+    private lateinit var callback: OnBackPressedCallback
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentSelectLabelBinding.inflate(inflater, container, false)
+
+        // OnBackPressedCallback (익명 클래스) 객체 생성
+        callback = object : OnBackPressedCallback(true) {
+            // 뒤로가기 했을 때 실행되는 기능
+            override fun handleOnBackPressed() {
+                if (binding.addLabelConstraintLayout.visibility == View.VISIBLE) {
+                    binding.addLabelConstraintLayout.visibility = View.GONE
+                } else {
+                    removeFragment()
+                }
+            }
+        }
+        // 액티비티의 BackPressedDispatcher에 여기서 만든 callback 객체를 등록
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        selectLabelAdapter = SelectLabelAdapter(memoViewModel.selectedMemo.value!!.label, this)
+        selectLabelAdapter =
+            SelectLabelAdapter(memoViewModel.selectedMemo.value!!.label, this)
 
-        binding.searchRecyclerView.adapter = selectLabelAdapter
-        binding.searchRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.selectLabelRecyclerView.adapter = selectLabelAdapter
+        binding.selectLabelRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         selectLabelAdapter.submitList(memoViewModel.labelList.value!!)
 
@@ -63,9 +81,16 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
             val inputManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE)
                     as InputMethodManager
             inputManager.showSoftInput(binding.addLabelEditText, InputMethodManager.SHOW_IMPLICIT)
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(35)
-                binding.nestedScrollView.scrollTo(0, binding.addLabelBtn.bottom)
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.nestedScrollView.smoothScrollTo(0, binding.addLabelBtn.bottom)
+            }, 35)
+        }
+
+        binding.addLabelEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    binding.nestedScrollView.smoothScrollTo(0, binding.addLabelBtn.bottom)
+                }, 100)
             }
         }
 
@@ -93,6 +118,7 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
     private fun addLabel() {
         val label = binding.addLabelEditText.text.toString()
         if (label.isNotBlank() && !memoViewModel.labelList.value!!.contains(label)) {
+            memoViewModel.selectedMemo.value!!.label.add(label)
             memoViewModel.labelList.value!!.add(label)
             memoViewModel.labelList.value = memoViewModel.labelList.value!!.sorted().toMutableList()
             selectLabelAdapter.submitList(memoViewModel.labelList.value!!)
@@ -147,15 +173,21 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
 
     override fun labelCheckBoxClicked(position: Int) {
         val currentLabel = memoViewModel.labelList.value!![position]
-        if (memoViewModel.selectedMemo.value!!.label.contains(currentLabel)) {
-            memoViewModel.selectedMemo.value!!.label.remove(currentLabel)
-        } else {
+
+        if (!memoViewModel.selectedMemo.value!!.label.contains(currentLabel)) {
             memoViewModel.selectedMemo.value!!.label.add(currentLabel)
+            memoViewModel.selectedMemo.value!!.label =
+                memoViewModel.selectedMemo.value!!.label.sorted().toMutableList()
+        } else {
+            memoViewModel.selectedMemo.value!!.label.remove(currentLabel)
+            memoViewModel.selectedMemo.value!!.label =
+                memoViewModel.selectedMemo.value!!.label.sorted().toMutableList()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        callback.remove()
     }
 }

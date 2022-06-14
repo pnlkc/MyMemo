@@ -8,4 +8,6 @@
     <string name="search_label">라벨 검색</string>
     <string name="add_label">라벨 추가하기</string>
     <string name="label_name">라벨 이름</string>
+    <string name="noSearchResult">일치하는 메모가 없습니다</string>
+    <string name="edit_label">라벨 수정하기</string>
 </resources>

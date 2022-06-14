@@ -3,11 +3,11 @@ package com.example.mymemo
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
-import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -15,13 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mymemo.databinding.FragmentDrawerBinding
 import com.example.mymemo.recyclerview_drawer.DrawerAdapter
 import com.example.mymemo.recyclerview_drawer.IDrawerRecyclerView
+import com.example.mymemo.room.MemoEntity
 import com.example.mymemo.util.ConstData
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
@@ -38,7 +35,6 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NO_TITLE, R.style.fullscreen_dialog)
         isCancelable = true
-
     }
 
     // 들어오고 나갈때 애니메이션 설정
@@ -55,7 +51,6 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentDrawerBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -69,23 +64,7 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
         }
 
         binding.addLabelBtn.setOnClickListener {
-            binding.addLabelConstraintLayout.visibility = View.VISIBLE
-            binding.addLabelEditText.requestFocus()
-            val inputManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE)
-                    as InputMethodManager
-            inputManager.showSoftInput(binding.addLabelEditText, InputMethodManager.SHOW_IMPLICIT)
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(35)
-                binding.nestedScrollView.scrollTo(0, binding.addLabelBtn.bottom)
-            }
-        }
-
-        binding.addLabelEditText.setOnKeyListener { _, keyCode, _ ->
-            enterKeyboard(keyCode)
-        }
-
-        binding.addLabelConfirmBtn.setOnClickListener {
-            addLabel()
+            moveEditLabelFragment()
         }
 
         binding.drawerEmptySpace.setOnClickListener {
@@ -120,53 +99,12 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
         }
     }
 
-    // 엔터누르면 실행되는 기능
-    private fun enterKeyboard(keyCode: Int): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_ENTER -> {
-                addLabel()
-                return true
-            }
-        }
-        return false
-    }
-
-    // 라벨을 추가하는 기능
-    private fun addLabel() {
-        val label = binding.addLabelEditText.text.toString()
-        if (label.isNotBlank() && !memoViewModel.labelList.value!!.contains(label)) {
-            memoViewModel.labelList.value!!.add(label)
-            memoViewModel.labelList.value = memoViewModel.labelList.value!!.sorted().toMutableList()
-            saveLabelList()
-            Toast.makeText(requireContext(),
-                "\"$label\" 라벨이 추가되었습니다", Toast.LENGTH_SHORT).show()
-        } else if (label.isBlank()) {
-            Toast.makeText(requireContext(),
-                "라벨 이름은 비어있을 수 없습니다", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(requireContext(),
-                "같은 이름의 라벨이 이미 있습니다", Toast.LENGTH_SHORT).show()
-        }
-
-        controlAddLabelLayout()
-    }
-
-    private fun controlAddLabelLayout() {
-        // 키보드 내리는 기능
-        val inputManager = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE)
-                as InputMethodManager
-        inputManager.hideSoftInputFromWindow(view?.windowToken, 0)
-
-        // 포커스 사라지게 하는 기능
-        binding.addLabelEditText.clearFocus()
-        binding.addLabelEditText.text!!.clear()
-
-        // 라벨 추가용 레이아웃 사라지게하는 코드
-        binding.addLabelConstraintLayout.visibility = View.GONE
-    }
-
     private fun moveMemoListFragment() {
         findNavController().navigate(R.id.action_drawerFragment_to_memoListFragment)
+    }
+
+    private fun moveEditLabelFragment() {
+        findNavController().navigate(R.id.action_drawerFragment_to_editLabelFragment)
     }
 
     private fun removeFragment() {
@@ -195,6 +133,15 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
                         memoViewModel.editMemo(memo)
                     }
                 }
+
+                // 현재 선택된 라벨을 삭제하는 경우
+                if (label == memoViewModel.selectedLabel.value) {
+                    memoViewModel.selectedLabel.value = null
+                    // MemoListFragment 리사이클러뷰 업데이트용 덤프 메모 추가 후 삭제
+                    memoViewModel.addMemo(MemoEntity(-1L))
+                    memoViewModel.deleteMemo(MemoEntity(-1L))
+                }
+
                 saveLabelList()
                 setRecyclerView()
             }

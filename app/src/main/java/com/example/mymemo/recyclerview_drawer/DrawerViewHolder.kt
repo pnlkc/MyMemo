@@ -7,7 +7,7 @@ import com.example.mymemo.databinding.ItemDrawerBinding
 
 class DrawerViewHolder(
     binding: ItemDrawerBinding,
-    private var recyclerViewInterface: IDrawerRecyclerView,
+    private var recyclerViewInterface: IDrawerRecyclerView
 ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnLongClickListener {
 
     private val labelTextView = binding.labelTextview

@@ -46,7 +46,6 @@
     <color name="drawer_main_color">#353535</color>
     <color name="drawer_bg">#faf4f1</color>
     <color name="drawer_divisionLine">#E6C19EFF</color>
-    <color name="drawer_edit_text_hint">#505050</color>
     <color name="drawer_ripple">#DCD6D4</color>
     <color name="drawer_selected_ripple">#faf4f1</color>
     <color name="drawer_selected_bar">#AE80FF</color>

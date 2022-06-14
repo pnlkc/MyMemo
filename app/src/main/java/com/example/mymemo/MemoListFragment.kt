@@ -13,6 +13,7 @@ import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -62,7 +63,6 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
             // 뒤로가기 했을 때 실행되는 기능
             var backWait: Long = 0
             override fun handleOnBackPressed() {
-
                 if (memoViewModel.selectedLabel.value != null) {
                     memoViewModel.selectedLabel.value = null
                     findNavController().navigate(R.id.action_memoListFragment_pop)
@@ -113,12 +113,7 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
             if (memoViewModel.memoType.value == MEMO_TYPE.NEW) setRecyclerView()
         }
 
-        binding.memoAddBtn.setOnClickListener {
-            memoViewModel.memoType.value = MEMO_TYPE.NEW
-            memoViewModel.selectedMemo.value = MemoEntity(null)
-            moveEditFragment()
-        }
-
+        // 최하단 스크롤시 메모 추가버튼 숨기는 기능
         binding.memoRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -126,6 +121,17 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
                 hideAddMemoBtn(recyclerView)
             }
         })
+
+        binding.memoAddBtn.setOnClickListener {
+            memoViewModel.memoType.value = MEMO_TYPE.NEW
+            if (memoViewModel.selectedLabel.value != null) {
+                memoViewModel.selectedMemo.value =
+                    MemoEntity(null, label = mutableListOf(memoViewModel.selectedLabel.value!!))
+            } else {
+                memoViewModel.selectedMemo.value = MemoEntity(null)
+            }
+            moveEditFragment()
+        }
 
         binding.memoSearchBtn.setOnClickListener {
             moveSearchFragment()
@@ -169,10 +175,9 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder,
-            ): Boolean {
-                TODO("Not yet implemented")
-            }
+            ): Boolean = false
 
+            // 삭제하는 메모가 최상단이나 최하단인지 확인
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val memo = filterList[viewHolder.bindingAdapterPosition]
                 when (viewHolder.bindingAdapterPosition) {
@@ -193,9 +198,13 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
             layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
                     .apply { stackFromEnd = true }
-
-            // 아래 코드 입력 안해도 리사이클러뷰 스크롤 포지션 저장 되는듯..
-//            memoAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            doOnPreDraw {
+                // 메모를 새로 추가했으면 최상단으로 스크롤
+                if (memoViewModel.memoType.value == MEMO_TYPE.NEW) {
+                    binding.memoRecyclerView
+                        .scrollToPosition(filterList.lastIndex)
+                }
+            }
         }
     }
 
@@ -204,7 +213,6 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
         memoViewModel.memoType.value = MEMO_TYPE.NOTHING
         memoViewModel.deleteMemo(memo)
     }
-
 
     // 메모 삭제시 복구용 커스텀 스낵바
     private fun showSnackBar(memo: MemoEntity) {
@@ -289,9 +297,15 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
         // 삭제 다이얼로그 보여주기
         AlertDialog.Builder(context)
             .setTitle("MyMemo")
-            .setMessage("\"${filterList[position].title}\"" +
-                    " 메모를 삭제하시겠습니까?")
+            .setMessage(
+                if (filterList[position].title.isNotEmpty()) {
+                    "\"${filterList[position].title}\""
+                } else {
+                    "\"제목 없음\""
+                } + " 메모를 삭제하시겠습니까?"
+            )
             .setPositiveButton("확인") { _, _ ->
+                // 삭제하는 메모가 최상단이나 최하단인지 확인
                 when (position) {
                     0 -> bottomPosition = true
                     filterList.lastIndex -> topPosition = true
@@ -315,6 +329,7 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
         findNavController().navigate(R.id.action_memoListFragment_to_memoSearchFragment)
     }
 
+    // Drawer(메뉴) 화면 이동 기능
     private fun moveDrawerFragment() {
         findNavController().navigate(R.id.action_memoListFragment_to_drawerFragment)
     }

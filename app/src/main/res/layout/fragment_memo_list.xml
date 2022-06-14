@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/memoListBg"
-        android:paddingHorizontal="20dp">
+        >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar_layout"
@@ -43,20 +43,22 @@
                 android:id="@+id/memo_search_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="?attr/selectableItemBackground"
                 android:src="@drawable/search_btn"
                 android:layout_gravity="bottom|end"
-                android:layout_marginBottom="13dp"
+                android:layout_marginEnd="7dp"
+                android:padding="13dp"
                 app:layout_collapseMode="pin" />
 
             <ImageView
                 android:id="@+id/drawer_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="?attr/selectableItemBackground"
                 android:src="@drawable/drawer_btn"
                 android:layout_gravity="bottom|start"
-                android:layout_marginBottom="13dp"
+                android:layout_marginStart="7dp"
+                android:padding="13dp"
                 app:layout_collapseMode="pin" />
 
 

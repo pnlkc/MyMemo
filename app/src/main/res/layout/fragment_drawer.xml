@@ -93,44 +93,6 @@
                 android:nestedScrollingEnabled="false"
                 android:overScrollMode="never" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/add_label_constraint_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:visibility="gone">
-
-                <com.example.mymemo.util.ClearFocusEditText
-                    android:id="@+id/add_label_edit_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/edit_text_outline"
-                    android:hint="@string/add_label_edit_text_hint"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:padding="10dp"
-                    android:textColor="@color/drawer_main_color"
-                    android:textColorHint="@color/drawer_edit_text_hint"
-                    android:textCursorDrawable="@drawable/edit_text_cursor"
-                    android:textSize="15sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/add_label_confirm_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:src="@drawable/check_btn"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
             <LinearLayout
                 android:id="@+id/add_label_btn"
                 android:layout_width="match_parent"
@@ -152,7 +114,7 @@
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/gmarket_sans_medium"
-                    android:text="@string/add_label"
+                    android:text="@string/edit_label"
                     android:textColor="@color/drawer_main_color"
                     android:textSize="15sp"
                     android:textStyle="italic" />

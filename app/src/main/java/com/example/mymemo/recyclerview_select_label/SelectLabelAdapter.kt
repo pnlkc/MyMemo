@@ -7,7 +7,8 @@ import com.example.mymemo.databinding.ItemSelectLabelBinding
 import com.example.mymemo.util.DiffUtilItemCallback
 
 class SelectLabelAdapter(
-    private val memoLabelList: MutableList<String>, private val recyclerViewInterface: ISelectLabel,
+    private val memoLabelList: MutableList<String>,
+    private val recyclerViewInterface: ISelectLabel
 ) : ListAdapter<String, SelectLabelViewHolder>(DiffUtilItemCallback.stringDiffUtil) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectLabelViewHolder {

@@ -7,9 +7,11 @@ import com.example.mymemo.room.MemoEntity
 // 리사이클러뷰 Adapter에서 ListAdapter() 상속받아서 사용
 object DiffUtilItemCallback {
     val stringDiffUtil = object: DiffUtil.ItemCallback<String>() {
-        override fun areContentsTheSame(oldItem: String, newItem: String) = oldItem == newItem
+        // 이걸 false 안하면 맨 마지막에 아이템 추가시 리사이클러뷰 업데이트가 안되는 문제 발생
+        override fun areContentsTheSame(oldItem: String, newItem: String) = false
 
         override fun areItemsTheSame(oldItem: String, newItem: String) = oldItem == newItem
+
     }
 
     val memoDiffUtil = object: DiffUtil.ItemCallback<MemoEntity>() {

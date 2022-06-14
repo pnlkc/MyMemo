@@ -12,7 +12,7 @@
     <color name="dashLine">#80A1A1A1</color>
     <color name="addBtn">#6a4a4c</color>
     <color name="backBtn">#B58D8F</color>
-    <color name="clearBtn">#6a4a4c</color>
+    <color name="clearBtn">#B58D8F</color>
     <color name="edit_text_cursor">#B58D8F</color>
     <color name="divisionLine">#4DFFFFFF</color>
     <color name="addBtnComponent">#FFFFFFFF</color>
@@ -46,7 +46,6 @@
     <color name="drawer_main_color">#CCDCD9D9</color>
     <color name="drawer_bg">#332D2D</color>
     <color name="drawer_divisionLine">#6a4a4c</color>
-    <color name="drawer_edit_text_hint">#CCC1C0C0</color>
     <color name="drawer_ripple">#5C5757</color>
     <color name="drawer_selected_ripple">#332D2D</color>
     <color name="drawer_selected_bar">#6a4a4c</color>

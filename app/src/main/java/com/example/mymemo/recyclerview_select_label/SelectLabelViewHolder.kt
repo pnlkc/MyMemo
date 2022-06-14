@@ -6,9 +6,8 @@ import com.example.mymemo.databinding.ItemSelectLabelBinding
 
 class SelectLabelViewHolder(
     binding: ItemSelectLabelBinding,
-    private var recyclerViewInterface: ISelectLabel,
-) :
-    RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    private var recyclerViewInterface: ISelectLabel
+) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
     private val labelTextView = binding.labelTextview
     private val labelCheckBox = binding.labelCheckbox
