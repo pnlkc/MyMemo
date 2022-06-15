@@ -79,6 +79,10 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
                 moveMemoListFragment()
             }
         }
+
+        binding.settingBtn.setOnClickListener {
+            moveSettingFragment()
+        }
     }
 
     private fun setRecyclerView() {
@@ -105,6 +109,10 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
 
     private fun moveEditLabelFragment() {
         findNavController().navigate(R.id.action_drawerFragment_to_editLabelFragment)
+    }
+
+    private fun moveSettingFragment() {
+        findNavController().navigate(R.id.action_drawerFragment_to_settingFragment)
     }
 
     private fun removeFragment() {

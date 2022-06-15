@@ -38,6 +38,7 @@
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/label_background.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/memo_add_btn.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/search_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/setting_icon.xml" value="0.1955" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/activity_main.xml" value="0.3848958333333333" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/custom_snackbar.xml" value="0.5" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/drawer_item.xml" value="0.3848958333333333" />
@@ -48,6 +49,7 @@
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_memo_list.xml" value="0.2814814814814815" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_memo_search.xml" value="0.3314814814814815" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_select_label.xml" value="0.3848958333333333" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_setting.xml" value="0.5" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_drawer.xml" value="0.3848958333333333" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_edit_label.xml" value="0.3848958333333333" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_label.xml" value="0.3848958333333333" />

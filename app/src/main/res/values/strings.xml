@@ -10,4 +10,9 @@
     <string name="label_name">라벨 이름</string>
     <string name="noSearchResult">일치하는 메모가 없습니다</string>
     <string name="edit_label">라벨 수정하기</string>
+    <string name="setting">설정</string>
+    <string name="memo_export_description">메모 데이터 파일은 스마트폰 내장메모리의 \"Download\" 폴더에 저장됩니다. 저장되는 파일은 \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3개입니다.</string>
+    <string name="memo_export">메모 데이터 내보내기</string>
+    <string name="memo_import">메모 데이터 가져오기</string>
+    <string name="memo_import_description">가져올 파일은 스마트폰 내장메모리의 \"Download\" 폴더에 위치해야 합니다. \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3가지 파일 모두 필요합니다.</string>
 </resources>

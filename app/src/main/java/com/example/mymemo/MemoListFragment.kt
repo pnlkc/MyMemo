@@ -110,7 +110,9 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
             }
 
             // 메모가 새로 추가된 경우 메모 리스트 최상단으로 스크롤
-            if (memoViewModel.memoType.value == MEMO_TYPE.NEW) setRecyclerView()
+            if (memoViewModel.memoType.value == MEMO_TYPE.NEW) {
+                binding.memoRecyclerView.scrollToPosition(filterList.lastIndex)
+            }
         }
 
         // 최하단 스크롤시 메모 추가버튼 숨기는 기능
@@ -201,8 +203,11 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
             doOnPreDraw {
                 // 메모를 새로 추가했으면 최상단으로 스크롤
                 if (memoViewModel.memoType.value == MEMO_TYPE.NEW) {
-                    binding.memoRecyclerView
-                        .scrollToPosition(filterList.lastIndex)
+                    binding.memoRecyclerView.scrollToPosition(filterList.lastIndex)
+                } else if (memoViewModel.selectedLabel.value == null) {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        binding.memoRecyclerView.scrollToPosition(filterList.lastIndex)
+                    }, 35)
                 }
             }
         }

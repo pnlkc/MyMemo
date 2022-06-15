@@ -51,4 +51,8 @@
     <color name="drawer_selected_bar">#6a4a4c</color>
     <color name="drawer_selected_bg">#4D705B5B</color>
 
+    <color name="setting_main_color">#CCDCD9D9</color>
+    <color name="setting_category_color">#B58D8F</color>
+    <color name="setting_description_color">#CCA8A7A7</color>
+
 </resources>

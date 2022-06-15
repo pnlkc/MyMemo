@@ -76,6 +76,11 @@
             app:destination="@id/editLabelFragment"
             app:popExitAnim="@anim/slide_out_left"
             app:popUpTo="@id/memoListFragment" />
+        <action
+            android:id="@+id/action_drawerFragment_to_settingFragment"
+            app:destination="@id/settingFragment"
+            app:popExitAnim="@anim/slide_out_left"
+            app:popUpTo="@id/memoListFragment" />
     </dialog>
     <fragment
         android:id="@+id/selectLabelFragment"
@@ -96,5 +101,19 @@
             android:id="@+id/action_editLabelFragment_pop"
             app:popUpTo="@id/editLabelFragment"
             app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.example.mymemo.SettingFragment"
+        android:label="fragment_setting"
+        tools:layout="@layout/fragment_setting" >
+        <action
+            android:id="@+id/action_settingFragment_pop"
+            app:popUpTo="@id/settingFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_settingFragment_to_memoListFragment"
+            app:destination="@id/memoListFragment"
+            app:popUpTo="@id/memoListFragment" />
     </fragment>
 </navigation>
