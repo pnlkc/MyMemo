@@ -14,6 +14,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -35,6 +37,8 @@ class SettingFragment : Fragment() {
 
     // OnBackPressedCallback (뒤로가기 기능) 객체 선언
     private lateinit var callback: OnBackPressedCallback
+
+    private var path = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,12 +67,37 @@ class SettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val exportResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == AppCompatActivity.RESULT_OK) {
+                    val resultData = it.data?.data?.path.toString()
+                    val index = resultData.indexOf(":")
+                    path = resultData.removeRange(0..index)
+                    exportDatabase(path)
+                }
+            }
+
+        val importResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == AppCompatActivity.RESULT_OK) {
+                    val resultData = it.data?.data?.path.toString()
+                    val index = resultData.indexOf(":")
+                    path = resultData.removeRange(0..index)
+                    importDatabase(path)
+                }
+            }
+
+
         binding.memoExport.setOnClickListener {
-            exportDatabase()
+            requestPermission()
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+            exportResultLauncher.launch(intent)
         }
 
         binding.memoImport.setOnClickListener {
-            importDatabase()
+            requestPermission()
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+            importResultLauncher.launch(intent)
         }
 
         binding.backButton.setOnClickListener {
@@ -81,21 +110,19 @@ class SettingFragment : Fragment() {
     }
 
     // 메모 데이터 파일 내보내기 기능
-    private fun exportDatabase() {
+    private fun exportDatabase(path: String) {
         try {
             val sd = Environment.getExternalStorageDirectory()
             val data = Environment.getDataDirectory()
 
             if (sd!!.canWrite()) {
-                Log.d("로그", "SettingFragment - exportDatabase() 호출됨")
                 val currentDB = File(data, "/data/com.example.mymemo/databases/memo.db")
                 val currentSHM = File(data, "/data/com.example.mymemo/databases/memo.db-shm")
                 val currentWAl = File(data, "/data/com.example.mymemo/databases/memo.db-wal")
-                val exportDB = File(sd, "/Download/memo.db")
-                val exportSHM = File(sd, "/Download/memo.db-shm")
-                val exportWAL = File(sd, "/Download/memo.db-wal")
+                val exportDB = File(sd, "/$path/memo.db")
+                val exportSHM = File(sd, "/$path/memo.db-shm")
+                val exportWAL = File(sd, "/$path/memo.db-wal")
 
-                Log.d("로그", "SettingFragment - exportDatabase2() 호출됨")
                 val dbInputStream = FileInputStream(currentDB).channel
                 val dbOutputStream = FileOutputStream(exportDB).channel
                 dbOutputStream.transferFrom(dbInputStream, 0, dbInputStream.size())
@@ -116,7 +143,7 @@ class SettingFragment : Fragment() {
 
                 Toast.makeText(requireContext(), "내보내기 성공", Toast.LENGTH_SHORT).show()
             } else {
-                requestPermission()
+                Log.d("로그", "SettingFragment - exportDatabase() 권한 오류")
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -126,7 +153,7 @@ class SettingFragment : Fragment() {
     }
 
     // 메모 데이터 파일 가져오기 기능
-    private fun importDatabase() {
+    private fun importDatabase(path: String) {
         try {
             val sd = Environment.getExternalStorageDirectory()
             val data = Environment.getDataDirectory()
@@ -135,9 +162,9 @@ class SettingFragment : Fragment() {
                 val currentDB = File(data, "/data/com.example.mymemo/databases/memo.db")
                 val currentSHM = File(data, "/data/com.example.mymemo/databases/memo.db-shm")
                 val currentWAl = File(data, "/data/com.example.mymemo/databases/memo.db-wal")
-                val importDB = File(sd, "/Download/memo.db")
-                val importSHM = File(sd, "/Download/memo.db-shm")
-                val importWAL = File(sd, "/Download/memo.db-wal")
+                val importDB = File(sd, "/$path/memo.db")
+                val importSHM = File(sd, "/$path/memo.db-shm")
+                val importWAL = File(sd, "/$path/memo.db-wal")
 
                 val dataStream = { original: File, overwrite: File ->
                     val inputStream = FileInputStream(original).channel
@@ -156,7 +183,7 @@ class SettingFragment : Fragment() {
 
                 Toast.makeText(requireContext(), "가져오기 성공", Toast.LENGTH_SHORT).show()
             } else {
-                requestPermission()
+                Log.d("로그", "SettingFragment - importDatabase() 권한 오류")
             }
         } catch (e: Exception) {
             e.printStackTrace()
