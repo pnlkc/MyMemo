@@ -11,8 +11,16 @@
     <string name="noSearchResult">일치하는 메모가 없습니다</string>
     <string name="edit_label">라벨 수정하기</string>
     <string name="setting">설정</string>
-    <string name="memo_export_description">저장되는 파일은 \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3개입니다. 안드로이드 보안정책으로 인해 특정 폴더에는 저장할 수 없을 수도 있습니다.</string>
     <string name="memo_export">메모 데이터 내보내기</string>
+    <string name="memo_export_description">저장되는 파일은 \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3개입니다. 안드로이드 보안정책으로 인해 특정 폴더에는 저장(로드)이 안 될 수 있습니다.</string>
     <string name="memo_import">메모 데이터 가져오기</string>
-    <string name="memo_import_description">메모를 가져오기 위해서는 \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3가지 파일 모두 선택한 폴더에 있어야 합니다.</string>
+    <string name="memo_import_description">메모를 가져오기 위해서는 \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3가지 파일 모두 선택한 폴더에 있어야 합니다. 기존의 메모는 사라집니다.</string>
+    <string name="memo_backup">메모 백업하기</string>
+    <string name="memo_backup_description">백업 파일은 인증된 구글 아이디와 연결되어 백업됩니다. 백업된 파일은 직접 액세스할 수 없습니다.</string>
+    <string name="memo_restore">메모 복원하기</string>
+    <string name="memo_restore_description">인증된 구글 아이디와 연결된 파일로 메모를 복원합니다. 기존의 메모는 사라집니다.</string>
+    <string name="login_google_id">연동하기</string>
+    <string name="login_google_id_description">구글 아이디로 계정에 로그인합니다.</string>
+    <string name="logout_google_id">연동 해제</string>
+    <string name="logout_google_id_description">연결된 계정을 로그아웃합니다.</string>
 </resources>

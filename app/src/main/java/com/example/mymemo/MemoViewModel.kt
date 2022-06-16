@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide.init
 import com.example.mymemo.room.MemoDatabase
 import com.example.mymemo.room.MemoEntity
 import com.example.mymemo.room.MemoRepository

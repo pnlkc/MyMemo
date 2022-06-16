@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -145,9 +147,10 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
                 // 현재 선택된 라벨을 삭제하는 경우
                 if (label == memoViewModel.selectedLabel.value) {
                     memoViewModel.selectedLabel.value = null
-                    // MemoListFragment 리사이클러뷰 업데이트용 덤프 메모 추가 후 삭제
-                    memoViewModel.addMemo(MemoEntity(-1L))
-                    memoViewModel.deleteMemo(MemoEntity(-1L))
+                    memoViewModel.addMemo(MemoEntity(-1))
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        memoViewModel.deleteMemo(MemoEntity(-1))
+                    }, 100)
                 }
 
                 saveLabelList()
