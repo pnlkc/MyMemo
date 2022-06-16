@@ -34,7 +34,6 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
 
     private val searchAdapter = SearchAdapter(this)
 
-    private lateinit var allMemo: List<MemoEntity>
     private var filterMemo: MutableList<MemoEntity> = mutableListOf()
 
     override fun onCreateView(
@@ -52,8 +51,6 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
         setRecyclerView()
 
         detectInputTextChanging(binding.searchEditTextClearBtn, binding.searchEditText)
-
-        allMemo = memoViewModel.readAllData.value!!
 
         CoroutineScope(Dispatchers.Main).launch {
             binding.mainResultLinearLayout.visibility = View.INVISIBLE
@@ -91,7 +88,8 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
                 // 텍스트가 공백이 아니면 메모 검색하기
                 if (text.isNotBlank()) {
                     filterMemo.clear()
-
+                    val allMemo = memoViewModel.readAllData.value!!.toMutableList()
+                    allMemo.removeFirst()
                     allMemo.forEach { memoEntity ->
                         if (memoEntity.memo.contains(text) || memoEntity.title.contains(text)) {
                             filterMemo.add(memoEntity)

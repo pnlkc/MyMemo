@@ -5,7 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.mymemo.util.GsonConverter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // entities는 사용할 Entitiy를 선언 해주면 됨 []는 배열을 의미
 // version은 Entity 구조 변경시 구분해주는 역할
@@ -20,14 +24,31 @@ abstract class MemoDatabase : RoomDatabase() {
         @Volatile
         var INSTANCE: MemoDatabase? = null
 
-        fun getInstance(context: Context) : MemoDatabase? {
+        fun getInstance(context: Context): MemoDatabase? {
             if (INSTANCE == null) {
                 synchronized(MemoDatabase::class) {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         MemoDatabase::class.java,
                         "memo.db"
-                    ).build()
+                    ).addCallback(object : Callback() {
+                        // 데이터베이스 생성시 최초 데이터 등록
+                        // 라벨 리스트 저장용 메모 생성
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                getInstance(context)!!.memoDAO().insert(
+                                    MemoEntity(
+                                        -2,
+                                        "LabelList",
+                                        "",
+                                        "00-00-00 오전 00:00",
+                                        mutableListOf())
+                                )
+                            }
+                        }
+
+                    }).build()
                 }
             }
 

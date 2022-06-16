@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mymemo.databinding.FragmentSelectLabelBinding
 import com.example.mymemo.recyclerview_select_label.ISelectLabel
 import com.example.mymemo.recyclerview_select_label.SelectLabelAdapter
-import com.example.mymemo.util.ConstData
+import com.example.mymemo.room.MemoEntity
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 
@@ -121,7 +121,7 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
             memoViewModel.labelList.value!!.add(label)
             memoViewModel.labelList.value = memoViewModel.labelList.value!!.sorted().toMutableList()
             selectLabelAdapter.setData(memoViewModel.labelList.value!!)
-            saveLabelList()
+            saveLabelList(memoViewModel.labelList.value!!)
             Toast.makeText(requireContext(),
                 "\"$label\" 라벨이 추가되었습니다", Toast.LENGTH_SHORT).show()
         } else if (label.isBlank()) {
@@ -150,20 +150,17 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
     }
 
     // LabelList 저장
-    private fun saveLabelList() {
-        val sharedPreferences =
-            requireActivity().getSharedPreferences(ConstData.KEY_PREFS, Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-
-        // Json 파일 변환을 위한 Gson 객체
-        val gson = GsonBuilder().create()
-
-        val typeLabelList: TypeToken<MutableList<String>> =
-            object : TypeToken<MutableList<String>>() {}
-
-        val jsonLabelList = gson.toJson(memoViewModel.labelList.value!!, typeLabelList.type)
-        editor.putString(ConstData.KEY_MEMO_LABEL_LIST, jsonLabelList)
-        editor.apply()
+    private fun saveLabelList(labelList: MutableList<String>) {
+        val memo = memoViewModel.readAllData.value!!.first()
+        memoViewModel.editMemo(
+            MemoEntity(
+                memo.id,
+                memo.title,
+                memo.memo,
+                memo.date,
+                labelList
+            )
+        )
     }
 
     private fun removeFragment() {

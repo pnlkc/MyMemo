@@ -1,16 +1,13 @@
 package com.example.mymemo
 
 import android.app.AlertDialog
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -25,13 +22,9 @@ import com.example.mymemo.databinding.FragmentMemoListBinding
 import com.example.mymemo.recyclerview_memo_list.IListRecyclerVIew
 import com.example.mymemo.recyclerview_memo_list.ListAdapter
 import com.example.mymemo.room.MemoEntity
-import com.example.mymemo.util.ConstData.KEY_MEMO_LABEL_LIST
-import com.example.mymemo.util.ConstData.KEY_PREFS
 import com.example.mymemo.util.MEMO_TYPE
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 
 class MemoListFragment : Fragment(), IListRecyclerVIew {
 
@@ -92,20 +85,23 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
 
         swipeAction()
 
-        loadLabelList()
-
         memoViewModel.readAllData.observe(viewLifecycleOwner) { memoList ->
+            memoViewModel.labelList.value = memoList.first().label
+
+            val allMemoList = memoList.toMutableList()
+            allMemoList.removeFirst()
+
             if (memoViewModel.selectedLabel.value != null) {
                 binding.collapsingToolbarLayout.title = memoViewModel.selectedLabel.value
                 filterList.clear()
-                memoList.forEach { memo ->
+                allMemoList.forEach { memo ->
                     if (memo.label.contains(memoViewModel.selectedLabel.value)) {
                         filterList.add(memo)
                     }
                 }
                 memoAdapter.submitList(filterList)
             } else {
-                filterList = memoList.toMutableList()
+                filterList = allMemoList
                 binding.collapsingToolbarLayout.title = "MyMemo"
                 memoAdapter.submitList(filterList)
             }
@@ -338,24 +334,6 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
     // Drawer(메뉴) 화면 이동 기능
     private fun moveDrawerFragment() {
         findNavController().navigate(R.id.action_memoListFragment_to_drawerFragment)
-    }
-
-
-    // LabelList 불러오기
-    private fun loadLabelList() {
-        val sharedPreferences =
-            requireActivity().getSharedPreferences(KEY_PREFS, Context.MODE_PRIVATE)
-
-        // Json 파일 변환을 위한 Gson 객체
-        val gson = GsonBuilder().create()
-
-        val typeLabelList: TypeToken<MutableList<String>> =
-            object : TypeToken<MutableList<String>>() {}
-
-        if (sharedPreferences.contains(KEY_MEMO_LABEL_LIST)) {
-            val jsonLabelList = sharedPreferences.getString(KEY_MEMO_LABEL_LIST, "")
-            memoViewModel.labelList.value = gson.fromJson(jsonLabelList, typeLabelList.type)
-        }
     }
 
     override fun onDestroyView() {

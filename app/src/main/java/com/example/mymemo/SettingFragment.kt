@@ -2,13 +2,11 @@ package com.example.mymemo
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
-import android.system.Os.close
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,13 +22,10 @@ import androidx.navigation.fragment.findNavController
 import com.example.mymemo.databinding.FragmentSettingBinding
 import com.example.mymemo.room.MemoEntity
 import com.example.mymemo.util.App
-import com.example.mymemo.util.ConstData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import java.io.*
 
@@ -74,6 +69,7 @@ class SettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 메모 클라우드 백업 연동 버튼 초기 설정
         when (App.checkAuth()) {
             // 로그인 되어 있으면
             true -> {
@@ -171,8 +167,11 @@ class SettingFragment : Fragment() {
             when (App.checkAuth()) {
                 // 로그인 되어 있으면
                 true -> {
+                    // 파이어베이스 로그아아웃
                     App.auth.signOut()
 
+                    // 구글 계정 로그아웃
+                    // 이 코드가 없으면 재로그인시 초기 로그인시 나오는 인텐트 팝업이 뜨지 않음
                     GoogleSignIn.getClient(
                         requireContext(),
                         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
@@ -196,6 +195,10 @@ class SettingFragment : Fragment() {
                         .build()
                     val signInIntent = GoogleSignIn.getClient(requireContext(), gso).signInIntent
                     gsoLauncher.launch(signInIntent)
+
+                    binding.loginGoogleIdTitle.text = getText(R.string.logout_google_id)
+                    binding.loginGoogleIdDescription.text =
+                        getText(R.string.logout_google_id_description)
                 }
             }
         }
@@ -242,6 +245,7 @@ class SettingFragment : Fragment() {
                 val exportSHM = File(sd, "/$path/memo.db-shm")
                 val exportWAL = File(sd, "/$path/memo.db-wal")
 
+                // original 파일을 overwrite 파일에 덮어씌우는 기능
                 val dataStream = { original: File, overwrite: File ->
                     val inputStream = FileInputStream(original).channel
                     val outputStream = FileOutputStream(overwrite).channel
@@ -279,6 +283,7 @@ class SettingFragment : Fragment() {
                 val importSHM = File(sd, "/$path/memo.db-shm")
                 val importWAL = File(sd, "/$path/memo.db-wal")
 
+                // original 파일을 overwrite 파일에 덮어씌우는 기능
                 val dataStream = { original: File, overwrite: File ->
                     val inputStream = FileInputStream(original).channel
                     val outputStream = FileOutputStream(overwrite).channel
@@ -291,10 +296,11 @@ class SettingFragment : Fragment() {
                 dataStream(importSHM, currentSHM)
                 dataStream(importWAL, currentWAl)
 
+                // MemoListFragment 리사이클러뷰 리프레시 (딜레이가 없으면 에러 발생)
                 memoViewModel.addMemo(MemoEntity(-1))
                 Handler(Looper.getMainLooper()).postDelayed({
                     memoViewModel.deleteMemo(MemoEntity(-1))
-                }, 350)
+                }, 35)
                 memoViewModel.selectedLabel.value = null
 
                 Toast.makeText(requireContext(), "가져오기 성공", Toast.LENGTH_SHORT).show()
@@ -507,10 +513,12 @@ class SettingFragment : Fragment() {
                 dataStream(importSHM, currentSHM)
                 dataStream(importWAL, currentWAl)
 
+                // MemoListFragment 리사이클러뷰 리프레시 (딜레이가 없으면 에러 발생)
                 memoViewModel.addMemo(MemoEntity(-1))
                 Handler(Looper.getMainLooper()).postDelayed({
                     memoViewModel.deleteMemo(MemoEntity(-1))
                 }, 35)
+
                 memoViewModel.selectedLabel.value = null
 
                 Toast.makeText(requireContext(), "복원 성공", Toast.LENGTH_SHORT).show()

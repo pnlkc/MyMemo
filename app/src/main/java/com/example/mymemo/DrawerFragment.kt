@@ -18,7 +18,6 @@ import com.example.mymemo.databinding.FragmentDrawerBinding
 import com.example.mymemo.recyclerview_drawer.DrawerAdapter
 import com.example.mymemo.recyclerview_drawer.IDrawerRecyclerView
 import com.example.mymemo.room.MemoEntity
-import com.example.mymemo.util.ConstData
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 
@@ -147,13 +146,14 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
                 // 현재 선택된 라벨을 삭제하는 경우
                 if (label == memoViewModel.selectedLabel.value) {
                     memoViewModel.selectedLabel.value = null
+                    // MemoListFragment 리사이클러뷰 리프레시 (딜레이가 없으면 에러 발생)
                     memoViewModel.addMemo(MemoEntity(-1))
                     Handler(Looper.getMainLooper()).postDelayed({
                         memoViewModel.deleteMemo(MemoEntity(-1))
-                    }, 100)
+                    }, 35)
                 }
 
-                saveLabelList()
+                saveLabelList( memoViewModel.labelList.value!!)
                 setRecyclerView()
             }
             .setNegativeButton("취소") { _, _ -> }
@@ -162,20 +162,17 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
     }
 
     // LabelList 저장
-    private fun saveLabelList() {
-        val sharedPreferences =
-            requireActivity().getSharedPreferences(ConstData.KEY_PREFS, Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-
-        // Json 파일 변환을 위한 Gson 객체
-        val gson = GsonBuilder().create()
-
-        val typeLabelList: TypeToken<MutableList<String>> =
-            object : TypeToken<MutableList<String>>() {}
-
-        val jsonLabelList = gson.toJson(memoViewModel.labelList.value!!, typeLabelList.type)
-        editor.putString(ConstData.KEY_MEMO_LABEL_LIST, jsonLabelList)
-        editor.apply()
+    private fun saveLabelList(labelList: MutableList<String>) {
+        val memo = memoViewModel.readAllData.value!!.first()
+        memoViewModel.editMemo(
+            MemoEntity(
+                memo.id,
+                memo.title,
+                memo.memo,
+                memo.date,
+                labelList
+            )
+        )
     }
 
     override fun onDestroyView() {
