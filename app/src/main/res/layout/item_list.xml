@@ -37,7 +37,7 @@
             android:fontFamily="@font/gmarket_sans_medium"
             android:hint="제목 없음"
             android:textColor="@color/memoItemText"
-            android:textSize="20sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

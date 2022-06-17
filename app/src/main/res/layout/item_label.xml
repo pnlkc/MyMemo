@@ -17,6 +17,7 @@
         tools:text="개인"
         android:textAllCaps="false"
         android:textColor="@color/memoEditLabelText"
+        android:textStyle="bold"
         android:textSize="12sp"
         android:layout_marginEnd="15dp"
         android:background="@drawable/label_background"
