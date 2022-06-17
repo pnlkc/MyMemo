@@ -2,8 +2,10 @@ package com.example.mymemo
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
@@ -22,12 +24,18 @@ import androidx.navigation.fragment.findNavController
 import com.example.mymemo.databinding.FragmentSettingBinding
 import com.example.mymemo.room.MemoEntity
 import com.example.mymemo.util.App
+import com.example.mymemo.util.ConstData.KEY_PREFS
+import com.example.mymemo.util.ConstData.KEY_VIBRATION_SETTING
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.*
-import java.io.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 class SettingFragment : Fragment() {
 
@@ -39,12 +47,20 @@ class SettingFragment : Fragment() {
     // OnBackPressedCallback (뒤로가기 기능) 객체 선언
     private lateinit var callback: OnBackPressedCallback
 
+    // 파이어베이스에 업로드하거나 다운로드 받을 때 모든 파일이 정상적으로 처리되었는지 확인용 변수
     private val uploadResultList = mutableListOf<Boolean>()
     private val downloadResultList = mutableListOf<Boolean>()
 
-    var downloadDB: File? = null
-    var downloadSHM: File? = null
-    var downloadWAL: File? = null
+    // 파이어베이스에서 다운로드 파일을 임시저장할 변수
+    private var downloadDB: File? = null
+    private var downloadSHM: File? = null
+    private var downloadWAL: File? = null
+
+    // 백업이나 복원 중에 다른 프래그먼트로 이동하지 못하게 하는 기능 구현용 변수
+    private var isWorking = false
+
+    // 백업이나 복원 작업 완료 시 진동 유무 설정용 변수
+    private var isVibrate = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,7 +73,7 @@ class SettingFragment : Fragment() {
         callback = object : OnBackPressedCallback(true) {
             // 뒤로가기 했을 때 실행되는 기능
             override fun handleOnBackPressed() {
-                removeFragment()
+                backAction()
             }
         }
         // 액티비티의 BackPressedDispatcher에 여기서 만든 callback 객체를 등록
@@ -68,6 +84,20 @@ class SettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setVibrationSetting("load")
+
+        // 다크모드 감지 코드 -> 다크모드에 따라 로딩 애니메이션 변경
+        when (requireContext().resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_YES -> {
+                binding.memoBackupLoadingLottie.setAnimation(R.raw.loading_lottie_animation_night)
+                binding.memoRestoreLoadingLottie.setAnimation(R.raw.loading_lottie_animation_night)
+            }
+            else -> {
+                binding.memoBackupLoadingLottie.setAnimation(R.raw.loading_lottie_animation)
+                binding.memoRestoreLoadingLottie.setAnimation(R.raw.loading_lottie_animation)
+            }
+        }
 
         // 메모 클라우드 백업 연동 버튼 초기 설정
         when (App.checkAuth()) {
@@ -86,7 +116,7 @@ class SettingFragment : Fragment() {
         }
 
         binding.backButton.setOnClickListener {
-            removeFragment()
+            backAction()
         }
 
         // 메모 내보내기(로컬) 기능
@@ -189,7 +219,8 @@ class SettingFragment : Fragment() {
                 false -> {
                     val gso = GoogleSignInOptions
                         .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        //R.string.default_web_client_id 에러시 project 수준의 classpath ...google-services:4.3.8 로 변경
+                        //R.string.default_web_client_id 에러시
+                        // project 수준의 classpath ...google-services:4.3.8 로 변경
                         .requestIdToken(getString(R.string.default_web_client_id))
                         .requestEmail()
                         .build()
@@ -205,10 +236,12 @@ class SettingFragment : Fragment() {
 
         // 메모 백업(클라우드) 기능
         binding.memoBackup.setOnClickListener {
+            binding.memoBackupLoading.visibility = View.VISIBLE
+            binding.touchBlocker.visibility = View.VISIBLE
+            isWorking = true
             when (App.checkAuth()) {
                 true -> {
                     uploadMemoData()
-                    checkUploadStatus()
                 }
                 false -> {
                     Toast.makeText(requireContext(),
@@ -219,6 +252,9 @@ class SettingFragment : Fragment() {
 
         // 메모 복원(클라우드) 기능
         binding.memoRestore.setOnClickListener {
+            binding.memoRestoreLoading.visibility = View.VISIBLE
+            binding.touchBlocker.visibility = View.VISIBLE
+            isWorking = true
             when (App.checkAuth()) {
                 true -> {
                     downloadMemoData()
@@ -228,6 +264,28 @@ class SettingFragment : Fragment() {
                         "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        binding.touchBlocker.setOnClickListener {
+            Toast.makeText(requireContext(),
+                "백업이나 복원이 완료된 다음 다시 시도해주세요", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.vibrationSettingSwitch.setOnCheckedChangeListener { _, isChecked ->
+            isVibrate = when (isChecked) {
+                true -> true
+                false ->  false
+            }
+            setVibrationSetting("save")
+        }
+    }
+
+
+    private fun backAction() {
+        when (isWorking) {
+            true -> Toast.makeText(requireContext(),
+                "백업이나 복원이 완료된 다음 화면을 이동해주세요", Toast.LENGTH_SHORT).show()
+            false -> removeFragment()
         }
     }
 
@@ -259,6 +317,8 @@ class SettingFragment : Fragment() {
                 dataStream(currentWAl, exportWAL)
 
                 Toast.makeText(requireContext(), "내보내기 성공", Toast.LENGTH_SHORT).show()
+
+                makeVibration()
             } else {
                 Log.d("로그", "SettingFragment - exportDatabase() 권한 오류")
             }
@@ -304,6 +364,8 @@ class SettingFragment : Fragment() {
                 memoViewModel.selectedLabel.value = null
 
                 Toast.makeText(requireContext(), "가져오기 성공", Toast.LENGTH_SHORT).show()
+
+                makeVibration()
             } else {
                 Log.d("로그", "SettingFragment - importDatabase() 권한 오류")
             }
@@ -396,14 +458,17 @@ class SettingFragment : Fragment() {
                 }
             }
         }
+
+        checkUploadStatus()
     }
 
     // 3개 파일 모두 백업 성공했는지 확인하고 토스트 메시지 보여주는 기능
     private fun checkUploadStatus() {
+        binding.memoBackupLoadingTextview.text = "메모를 백업하고 있습니다 (${uploadResultList.size}/3)"
         if (uploadResultList.size != 3) {
             Handler(Looper.getMainLooper()).postDelayed({
                 checkUploadStatus()
-            }, 500)
+            }, 35)
         } else {
             if (uploadResultList.contains(false)) {
                 Toast.makeText(requireContext(), "백업 실패", Toast.LENGTH_SHORT).show()
@@ -411,15 +476,22 @@ class SettingFragment : Fragment() {
                 Toast.makeText(requireContext(), "백업 성공", Toast.LENGTH_SHORT).show()
             }
             uploadResultList.clear()
+
+            // 백업 완료 후
+            binding.memoBackupLoading.visibility = View.INVISIBLE
+            binding.touchBlocker.visibility = View.INVISIBLE
+            isWorking = false
+            makeVibration()
         }
     }
 
     // 3개 파일 모두 다운로드 성공했는지 확인하고 토스트 메시지 보여주는 기능
     private fun checkDownloadStatus() {
+        binding.memoRestoreLoadingTextview.text = "메모를 복원하고 있습니다 (${downloadResultList.size}/3)"
         if (downloadResultList.size != 3) {
             Handler(Looper.getMainLooper()).postDelayed({
                 checkDownloadStatus()
-            }, 500)
+            }, 35)
         } else {
             if (downloadResultList.contains(false)) {
                 Toast.makeText(requireContext(), "복원 실패", Toast.LENGTH_SHORT).show()
@@ -485,9 +557,9 @@ class SettingFragment : Fragment() {
                     }
                 downloadTaskWAL.deleteOnExit()
             }
-
-            checkDownloadStatus()
         }
+
+        checkDownloadStatus()
     }
 
     // 복원 파일이 다운로드가 완료되면 메모 복원하는 기능
@@ -530,6 +602,52 @@ class SettingFragment : Fragment() {
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(requireContext(), "복원 실패", Toast.LENGTH_SHORT).show()
+        }
+
+        // 복원 완료 후
+        binding.memoRestoreLoading.visibility = View.INVISIBLE
+        binding.touchBlocker.visibility = View.INVISIBLE
+        isWorking = false
+        makeVibration()
+    }
+
+    // 진동 1회 발생
+    private fun makeVibration() {
+        if (isVibrate) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibrator =
+                    requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                val vibrationEffect =
+                    VibrationEffect.createOneShot(100L, VibrationEffect.DEFAULT_AMPLITUDE)
+                val combinedVibration = CombinedVibration.createParallel(vibrationEffect)
+                vibrator.vibrate(combinedVibration)
+            } else {
+                @Suppress("DEPRECATION")
+                val vibrator =
+                    requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                val vibrationEffect =
+                    VibrationEffect.createOneShot(100L, VibrationEffect.DEFAULT_AMPLITUDE)
+                vibrator.vibrate(vibrationEffect)
+            }
+        }
+    }
+
+    // SharedPreferences 사용해서 진동 설정 저장
+    private fun setVibrationSetting(mode: String) {
+        val sharedPreferences =
+            requireActivity().getSharedPreferences(KEY_PREFS, Context.MODE_PRIVATE)
+        when (mode) {
+            "save" -> {
+                val editor = sharedPreferences.edit()
+                editor.putBoolean(KEY_VIBRATION_SETTING, isVibrate)
+                editor.apply()
+            }
+            "load" -> {
+                if (sharedPreferences.contains(KEY_VIBRATION_SETTING)) {
+                    isVibrate = sharedPreferences.getBoolean(KEY_VIBRATION_SETTING, true)
+                    binding.vibrationSettingSwitch.isChecked = isVibrate
+                }
+            }
         }
     }
 

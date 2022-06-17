@@ -103,4 +103,7 @@ dependencies {
     // 파이어스토리지
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.firebaseui:firebase-ui-storage:8.0.1'
+
+    // 로티 애니메이션
+    implementation 'com.airbnb.android:lottie:5.2.0'
 }
