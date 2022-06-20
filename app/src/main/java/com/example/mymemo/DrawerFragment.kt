@@ -1,8 +1,6 @@
 package com.example.mymemo
 
-import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,8 +16,7 @@ import com.example.mymemo.databinding.FragmentDrawerBinding
 import com.example.mymemo.recyclerview_drawer.DrawerAdapter
 import com.example.mymemo.recyclerview_drawer.IDrawerRecyclerView
 import com.example.mymemo.room.MemoEntity
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
+import com.example.mymemo.util.DialogCreator
 
 
 class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
@@ -123,56 +120,6 @@ class DrawerFragment : DialogFragment(), IDrawerRecyclerView {
     override fun memoItemClicked(position: Int) {
         memoViewModel.selectedLabel.value = memoViewModel.labelList.value!![position]
         moveMemoListFragment()
-    }
-
-    override fun memoItemLongClicked(position: Int) {
-        val label = memoViewModel.labelList.value!![position]
-
-        // 삭제 다이얼로그 보여주기
-        AlertDialog.Builder(context)
-            .setTitle("라벨을 삭제하시겠습니까?")
-            .setMessage("\"${label}\"" +
-                    " 라벨을 모든 메모에서 삭제합니다.\n메모는 삭제되지 않습니다.")
-            .setPositiveButton("확인") { _, _ ->
-                memoViewModel.labelList.value!!.remove(label)
-
-                memoViewModel.readAllData.value!!.forEach { memo ->
-                    if (memo.label.contains(label)) {
-                        memo.label.remove(label)
-                        memoViewModel.editMemo(memo)
-                    }
-                }
-
-                // 현재 선택된 라벨을 삭제하는 경우
-                if (label == memoViewModel.selectedLabel.value) {
-                    memoViewModel.selectedLabel.value = null
-                    // MemoListFragment 리사이클러뷰 리프레시 (딜레이가 없으면 에러 발생)
-                    memoViewModel.addMemo(MemoEntity(-1))
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        memoViewModel.deleteMemo(MemoEntity(-1))
-                    }, 35)
-                }
-
-                saveLabelList( memoViewModel.labelList.value!!)
-                setRecyclerView()
-            }
-            .setNegativeButton("취소") { _, _ -> }
-            .create()
-            .show()
-    }
-
-    // LabelList 저장
-    private fun saveLabelList(labelList: MutableList<String>) {
-        val memo = memoViewModel.readAllData.value!!.first()
-        memoViewModel.editMemo(
-            MemoEntity(
-                memo.id,
-                memo.title,
-                memo.memo,
-                memo.date,
-                labelList
-            )
-        )
     }
 
     override fun onDestroyView() {

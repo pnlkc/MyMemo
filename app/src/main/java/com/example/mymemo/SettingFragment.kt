@@ -2,7 +2,6 @@ package com.example.mymemo
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -27,6 +26,7 @@ import com.example.mymemo.room.MemoEntity
 import com.example.mymemo.util.App
 import com.example.mymemo.util.ConstData.KEY_PREFS
 import com.example.mymemo.util.ConstData.KEY_VIBRATION_SETTING
+import com.example.mymemo.util.DialogCreator
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -146,9 +146,10 @@ class SettingFragment : Fragment() {
             }
 
         binding.memoExport.setOnClickListener {
-            requestPermission()
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-            exportLauncher.launch(intent)
+            requestPermission {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                exportLauncher.launch(intent)
+            }
         }
 
 
@@ -164,9 +165,10 @@ class SettingFragment : Fragment() {
             }
 
         binding.memoImport.setOnClickListener {
-            requestPermission()
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-            importLauncher.launch(intent)
+            requestPermission {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                importLauncher.launch(intent)
+            }
         }
 
 
@@ -212,7 +214,11 @@ class SettingFragment : Fragment() {
             when (App.checkAuth()) {
                 // 로그인 되어 있으면
                 true -> {
-                    showDialog("이 앱과 연결된 계정을 로그아웃하시겠습니까?") {
+                    DialogCreator().showDialog(
+                        requireContext(),
+                        getString(R.string.app_name),
+                        "이 앱과 연결된 계정을 로그아웃하시겠습니까?"
+                    ) {
                         // 파이어베이스 로그아아웃
                         App.auth.signOut()
 
@@ -248,17 +254,25 @@ class SettingFragment : Fragment() {
 
         // 메모 백업(클라우드) 기능
         binding.memoBackup.setOnClickListener {
-            showDialog("메모를 백업하시겠습니까?") {
-                binding.memoBackupLoading.visibility = View.VISIBLE
-                binding.touchBlocker.visibility = View.VISIBLE
-                isWorking = true
-                when (App.checkAuth()) {
-                    true -> {
-                        uploadMemoData()
-                    }
-                    false -> {
-                        Toast.makeText(requireContext(),
-                            "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+            DialogCreator().showDialog(
+                requireContext(),
+                getString(R.string.app_name),
+                "메모를 백업하시겠습니까?"
+            ) {
+                requestPermission {
+                    binding.memoBackupLoading.visibility = View.VISIBLE
+                    binding.touchBlocker.visibility = View.VISIBLE
+                    isWorking = true
+                    when (App.checkAuth()) {
+                        true -> {
+                            uploadMemoData()
+                        }
+                        false -> {
+                            Toast.makeText(requireContext(),
+                                "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+                            binding.memoBackupLoading.visibility = View.INVISIBLE
+                            binding.touchBlocker.visibility = View.INVISIBLE
+                        }
                     }
                 }
             }
@@ -266,17 +280,25 @@ class SettingFragment : Fragment() {
 
         // 메모 복원(클라우드) 기능
         binding.memoRestore.setOnClickListener {
-            showDialog("메모를 복원하시겠습니까?") {
-                binding.memoRestoreLoading.visibility = View.VISIBLE
-                binding.touchBlocker.visibility = View.VISIBLE
-                isWorking = true
-                when (App.checkAuth()) {
-                    true -> {
-                        downloadMemoData()
-                    }
-                    false -> {
-                        Toast.makeText(requireContext(),
-                            "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+            DialogCreator().showDialog(
+                requireContext(),
+                getString(R.string.app_name),
+                "메모를 복원하시겠습니까?"
+            ) {
+                requestPermission {
+                    binding.memoRestoreLoading.visibility = View.VISIBLE
+                    binding.touchBlocker.visibility = View.VISIBLE
+                    isWorking = true
+                    when (App.checkAuth()) {
+                        true -> {
+                            downloadMemoData()
+                        }
+                        false -> {
+                            Toast.makeText(requireContext(),
+                                "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+                            binding.memoRestoreLoading.visibility = View.INVISIBLE
+                            binding.touchBlocker.visibility = View.INVISIBLE
+                        }
                     }
                 }
             }
@@ -386,12 +408,16 @@ class SettingFragment : Fragment() {
 
     // 외부 저장소 쓰기권한 요청 기능
     // 안드로이드 API 30 이상과 미만에 따른 권한 요청 방법 구분
-    private fun requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !isPermissionGranted()) {
-            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-            val uri = Uri.fromParts("package", requireContext().packageName, null)
-            intent.data = uri
-            requireContext().startActivity(intent)
+    private fun requestPermission(action: () -> Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!isPermissionGranted()) {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                val uri = Uri.fromParts("package", requireContext().packageName, null)
+                intent.data = uri
+                requireContext().startActivity(intent)
+            } else {
+                action()
+            }
         } else {
             if (ActivityCompat.checkSelfPermission(requireContext(),
                     Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
@@ -403,6 +429,8 @@ class SettingFragment : Fragment() {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
                 ActivityCompat.requestPermissions(requireActivity(), permission, 99)
+            } else {
+                action()
             }
         }
     }
@@ -604,9 +632,7 @@ class SettingFragment : Fragment() {
 
                 Toast.makeText(requireContext(), "복원 성공", Toast.LENGTH_SHORT).show()
             } else {
-                Log.d("로그", "SettingFragment - importDatabase() 권한 오류")
-                requestPermission()
-                restoreMemoData(importDB, importSHM, importWAL)
+                Log.d("로그", "SettingFragment - restoreMemoData() 권한 오류")
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -658,24 +684,6 @@ class SettingFragment : Fragment() {
                 }
             }
         }
-    }
-
-    // 다이얼로그 보여주는 기능
-    private fun showDialog(message: String, action: () -> Unit) {
-        AlertDialog.Builder(context)
-            .setTitle(getString(R.string.app_name))
-            .setMessage(message)
-            .setPositiveButton("확인") { _, _ ->
-                action()
-            }
-            .setNegativeButton("취소") { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
-            .setOnCancelListener {
-
-            }
-            .create()
-            .show()
     }
 
     override fun onDestroy() {

@@ -1,6 +1,5 @@
 package com.example.mymemo
 
-import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -22,6 +21,7 @@ import com.example.mymemo.databinding.FragmentMemoListBinding
 import com.example.mymemo.recyclerview_memo_list.IListRecyclerVIew
 import com.example.mymemo.recyclerview_memo_list.ListAdapter
 import com.example.mymemo.room.MemoEntity
+import com.example.mymemo.util.DialogCreator
 import com.example.mymemo.util.MEMO_TYPE
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
@@ -86,29 +86,31 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
         swipeAction()
 
         memoViewModel.readAllData.observe(viewLifecycleOwner) { memoList ->
-            memoViewModel.labelList.value = memoList.first().label
+            if (memoList.isNotEmpty()) {
+                memoViewModel.labelList.value = memoList.first().label
 
-            val allMemoList = memoList.toMutableList()
-            allMemoList.removeFirst()
+                val allMemoList = memoList.toMutableList()
+                allMemoList.removeFirst()
 
-            if (memoViewModel.selectedLabel.value != null) {
-                binding.collapsingToolbarLayout.title = memoViewModel.selectedLabel.value
-                filterList.clear()
-                allMemoList.forEach { memo ->
-                    if (memo.label.contains(memoViewModel.selectedLabel.value)) {
-                        filterList.add(memo)
+                if (memoViewModel.selectedLabel.value != null) {
+                    binding.collapsingToolbarLayout.title = memoViewModel.selectedLabel.value
+                    filterList.clear()
+                    allMemoList.forEach { memo ->
+                        if (memo.label.contains(memoViewModel.selectedLabel.value)) {
+                            filterList.add(memo)
+                        }
                     }
+                    memoAdapter.submitList(filterList)
+                } else {
+                    filterList = allMemoList
+                    binding.collapsingToolbarLayout.title = "MyMemo"
+                    memoAdapter.submitList(filterList)
                 }
-                memoAdapter.submitList(filterList)
-            } else {
-                filterList = allMemoList
-                binding.collapsingToolbarLayout.title = "MyMemo"
-                memoAdapter.submitList(filterList)
-            }
 
-            // 메모가 새로 추가된 경우 메모 리스트 최상단으로 스크롤
-            if (memoViewModel.memoType.value == MEMO_TYPE.NEW) {
-                binding.memoRecyclerView.scrollToPosition(filterList.lastIndex)
+                // 메모가 새로 추가된 경우 메모 리스트 최상단으로 스크롤
+                if (memoViewModel.memoType.value == MEMO_TYPE.NEW) {
+                    binding.memoRecyclerView.scrollToPosition(filterList.lastIndex)
+                }
             }
         }
 
@@ -296,28 +298,23 @@ class MemoListFragment : Fragment(), IListRecyclerVIew {
     override fun memoItemLongClicked(position: Int) {
         val memo = filterList[position]
 
-        // 삭제 다이얼로그 보여주기
-        AlertDialog.Builder(context)
-            .setTitle("MyMemo")
-            .setMessage(
-                if (filterList[position].title.isNotEmpty()) {
-                    "\"${filterList[position].title}\""
-                } else {
-                    "\"제목 없음\""
-                } + " 메모를 삭제하시겠습니까?"
-            )
-            .setPositiveButton("확인") { _, _ ->
-                // 삭제하는 메모가 최상단이나 최하단인지 확인
-                when (position) {
-                    0 -> bottomPosition = true
-                    filterList.lastIndex -> topPosition = true
-                }
-                deleteMemo(memo)
-                showSnackBar(memo)
+        DialogCreator().showDialog(
+            requireContext(),
+            getString(R.string.app_name),
+            if (filterList[position].title.isNotEmpty()) {
+                "\"${filterList[position].title}\""
+            } else {
+                "\"제목 없음\""
+            } + " 메모를 삭제하시겠습니까?"
+        ) {
+            // 삭제하는 메모가 최상단이나 최하단인지 확인
+            when (position) {
+                0 -> bottomPosition = true
+                filterList.lastIndex -> topPosition = true
             }
-            .setNegativeButton("취소") { _, _ -> }
-            .create()
-            .show()
+            deleteMemo(memo)
+            showSnackBar(memo)
+        }
     }
 
 
