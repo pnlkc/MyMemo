@@ -12,7 +12,7 @@
     <string name="edit_label">라벨 수정하기</string>
     <string name="setting">설정</string>
     <string name="memo_export">메모 데이터 내보내기</string>
-    <string name="memo_export_description">저장되는 파일은 \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3개입니다. 안드로이드 보안정책으로 인해 특정 폴더에는 저장(로드)이 안 될 수 있습니다.</string>
+    <string name="memo_export_description">저장되는 파일은 \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3개입니다. 안드로이드 보안정책으로 인해 특정 폴더에는 저장이 안 될 수 있습니다.</string>
     <string name="memo_import">메모 데이터 가져오기</string>
     <string name="memo_import_description">메모를 가져오기 위해서는 \"memo.db\", \"memo.db-shm\", \"memo.db-wal\" 3가지 파일 모두 선택한 폴더에 있어야 합니다. 기존의 메모는 사라집니다.</string>
     <string name="memo_backup">메모 백업하기</string>
