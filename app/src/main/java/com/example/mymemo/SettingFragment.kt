@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -62,6 +63,13 @@ class SettingFragment : Fragment() {
 
     // 백업이나 복원 작업 완료 시 진동 유무 설정용 변수
     private var isVibrate = true
+
+    // API 30 이상 퍼미션 런처
+    private lateinit var highAPIPermissionLauncher: ActivityResultLauncher<Intent>
+    // API 30 미만 퍼미션 런처
+    private lateinit var lowAPIPermissionLauncher: ActivityResultLauncher<Array<String>>
+    // 백업 및 복원시 최초 권한 획득 후, 기존의 작업을 자동으로 실행하기 위한 변수
+    private lateinit var currentAction: () -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -116,6 +124,29 @@ class SettingFragment : Fragment() {
             }
         }
 
+        highAPIPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (isPermissionGranted()) {
+                    requestPermission {
+                        currentAction()
+                    }
+                } else {
+                    Toast.makeText(requireContext(),
+                        "이 기능을 실행하려면 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        lowAPIPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                if (it.values.contains(false)) {
+                    Toast.makeText(requireContext(),
+                        "이 기능을 실행하려면 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    currentAction()
+                }
+            }
+
+
         // 상단의 뒤로가기 화살표 버튼 설정
         binding.backButton.setOnClickListener {
             backAction()
@@ -146,9 +177,13 @@ class SettingFragment : Fragment() {
             }
 
         binding.memoExport.setOnClickListener {
-            requestPermission {
+            currentAction = {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                 exportLauncher.launch(intent)
+            }
+
+            requestPermission {
+                currentAction()
             }
         }
 
@@ -165,9 +200,13 @@ class SettingFragment : Fragment() {
             }
 
         binding.memoImport.setOnClickListener {
-            requestPermission {
+            currentAction = {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                 importLauncher.launch(intent)
+            }
+
+            requestPermission {
+                currentAction()
             }
         }
 
@@ -252,6 +291,7 @@ class SettingFragment : Fragment() {
             }
         }
 
+
         // 메모 백업(클라우드) 기능
         binding.memoBackup.setOnClickListener {
             DialogCreator().showDialog(
@@ -259,7 +299,7 @@ class SettingFragment : Fragment() {
                 getString(R.string.app_name),
                 "메모를 백업하시겠습니까?"
             ) {
-                requestPermission {
+                currentAction = {
                     binding.memoBackupLoading.visibility = View.VISIBLE
                     binding.touchBlocker.visibility = View.VISIBLE
                     isWorking = true
@@ -275,6 +315,10 @@ class SettingFragment : Fragment() {
                         }
                     }
                 }
+
+                requestPermission {
+                    currentAction()
+                }
             }
         }
 
@@ -285,7 +329,7 @@ class SettingFragment : Fragment() {
                 getString(R.string.app_name),
                 "메모를 복원하시겠습니까?"
             ) {
-                requestPermission {
+                currentAction = {
                     binding.memoRestoreLoading.visibility = View.VISIBLE
                     binding.touchBlocker.visibility = View.VISIBLE
                     isWorking = true
@@ -301,6 +345,10 @@ class SettingFragment : Fragment() {
                         }
                     }
                 }
+
+                requestPermission {
+                    currentAction()
+                }
             }
         }
 
@@ -308,7 +356,6 @@ class SettingFragment : Fragment() {
             Toast.makeText(requireContext(),
                 "백업이나 복원이 완료된 다음 다시 시도해주세요", Toast.LENGTH_SHORT).show()
         }
-
 
     }
 
@@ -414,7 +461,7 @@ class SettingFragment : Fragment() {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                 val uri = Uri.fromParts("package", requireContext().packageName, null)
                 intent.data = uri
-                requireContext().startActivity(intent)
+                highAPIPermissionLauncher.launch(intent)
             } else {
                 action()
             }
@@ -428,12 +475,13 @@ class SettingFragment : Fragment() {
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
-                ActivityCompat.requestPermissions(requireActivity(), permission, 99)
+                lowAPIPermissionLauncher.launch(permission)
             } else {
                 action()
             }
         }
     }
+
 
     // MANAGE_EXTERNAL_STORAGE 권한 확인
     private fun isPermissionGranted(): Boolean {
