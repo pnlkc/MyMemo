@@ -2,6 +2,7 @@ package com.example.mymemo
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -115,8 +116,22 @@ class SettingFragment : Fragment() {
             }
         }
 
+        // 상단의 뒤로가기 화살표 버튼 설정
         binding.backButton.setOnClickListener {
             backAction()
+        }
+
+        // 백업 완료 시 진동 설정
+        binding.vibrationSetting.setOnClickListener {
+            binding.vibrationSettingSwitch.isChecked = !binding.vibrationSettingSwitch.isChecked
+        }
+
+        binding.vibrationSettingSwitch.setOnCheckedChangeListener { _, isChecked ->
+            isVibrate = when (isChecked) {
+                true -> true
+                false -> false
+            }
+            setVibrationSetting("save")
         }
 
         // 메모 내보내기(로컬) 기능
@@ -197,23 +212,24 @@ class SettingFragment : Fragment() {
             when (App.checkAuth()) {
                 // 로그인 되어 있으면
                 true -> {
-                    // 파이어베이스 로그아아웃
-                    App.auth.signOut()
+                    showDialog("이 앱과 연결된 계정을 로그아웃하시겠습니까?") {
+                        // 파이어베이스 로그아아웃
+                        App.auth.signOut()
 
-                    // 구글 계정 로그아웃
-                    // 이 코드가 없으면 재로그인시 초기 로그인시 나오는 인텐트 팝업이 뜨지 않음
-                    GoogleSignIn.getClient(
-                        requireContext(),
-                        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
-                    ).signOut()
+                        // 구글 계정 로그아웃
+                        // 이 코드가 없으면 재로그인시 초기 로그인시 나오는 인텐트 팝업이 뜨지 않음
+                        GoogleSignIn.getClient(
+                            requireContext(),
+                            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+                        ).signOut()
 
-                    Toast.makeText(requireContext(),
-                        "연동이 해제 되었습니다", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),
+                            "연동이 해제 되었습니다", Toast.LENGTH_SHORT).show()
 
-                    binding.loginGoogleIdTitle.text = getText(R.string.login_google_id)
-                    binding.loginGoogleIdDescription.text =
-                        getText(R.string.login_google_id_description)
-
+                        binding.loginGoogleIdTitle.text = getText(R.string.login_google_id)
+                        binding.loginGoogleIdDescription.text =
+                            getText(R.string.login_google_id_description)
+                    }
                 }
                 // 로그인 되어있지 않으면
                 false -> {
@@ -226,42 +242,42 @@ class SettingFragment : Fragment() {
                         .build()
                     val signInIntent = GoogleSignIn.getClient(requireContext(), gso).signInIntent
                     gsoLauncher.launch(signInIntent)
-
-                    binding.loginGoogleIdTitle.text = getText(R.string.logout_google_id)
-                    binding.loginGoogleIdDescription.text =
-                        getText(R.string.logout_google_id_description)
                 }
             }
         }
 
         // 메모 백업(클라우드) 기능
         binding.memoBackup.setOnClickListener {
-            binding.memoBackupLoading.visibility = View.VISIBLE
-            binding.touchBlocker.visibility = View.VISIBLE
-            isWorking = true
-            when (App.checkAuth()) {
-                true -> {
-                    uploadMemoData()
-                }
-                false -> {
-                    Toast.makeText(requireContext(),
-                        "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+            showDialog("메모를 백업하시겠습니까?") {
+                binding.memoBackupLoading.visibility = View.VISIBLE
+                binding.touchBlocker.visibility = View.VISIBLE
+                isWorking = true
+                when (App.checkAuth()) {
+                    true -> {
+                        uploadMemoData()
+                    }
+                    false -> {
+                        Toast.makeText(requireContext(),
+                            "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
 
         // 메모 복원(클라우드) 기능
         binding.memoRestore.setOnClickListener {
-            binding.memoRestoreLoading.visibility = View.VISIBLE
-            binding.touchBlocker.visibility = View.VISIBLE
-            isWorking = true
-            when (App.checkAuth()) {
-                true -> {
-                    downloadMemoData()
-                }
-                false -> {
-                    Toast.makeText(requireContext(),
-                        "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+            showDialog("메모를 복원하시겠습니까?") {
+                binding.memoRestoreLoading.visibility = View.VISIBLE
+                binding.touchBlocker.visibility = View.VISIBLE
+                isWorking = true
+                when (App.checkAuth()) {
+                    true -> {
+                        downloadMemoData()
+                    }
+                    false -> {
+                        Toast.makeText(requireContext(),
+                            "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -271,15 +287,8 @@ class SettingFragment : Fragment() {
                 "백업이나 복원이 완료된 다음 다시 시도해주세요", Toast.LENGTH_SHORT).show()
         }
 
-        binding.vibrationSettingSwitch.setOnCheckedChangeListener { _, isChecked ->
-            isVibrate = when (isChecked) {
-                true -> true
-                false ->  false
-            }
-            setVibrationSetting("save")
-        }
-    }
 
+    }
 
     private fun backAction() {
         when (isWorking) {
@@ -649,6 +658,24 @@ class SettingFragment : Fragment() {
                 }
             }
         }
+    }
+
+    // 다이얼로그 보여주는 기능
+    private fun showDialog(message: String, action: () -> Unit) {
+        AlertDialog.Builder(context)
+            .setTitle(getString(R.string.app_name))
+            .setMessage(message)
+            .setPositiveButton("확인") { _, _ ->
+                action()
+            }
+            .setNegativeButton("취소") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }
+            .setOnCancelListener {
+
+            }
+            .create()
+            .show()
     }
 
     override fun onDestroy() {

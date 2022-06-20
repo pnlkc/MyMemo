@@ -15,16 +15,16 @@
     <color name="clearBtn">#B58D8F</color>
     <color name="edit_text_cursor">#B58D8F</color>
     <color name="divisionLine">#4DFFFFFF</color>
-    <color name="addBtnComponent">#FFFFFFFF</color>
+    <color name="addBtnComponent">#CCFFFFFF</color>
     <color name="textHighlight">#877576</color>
     <color name="checkCircleBtnBG">#CCDCD9D9</color>
 
     <color name="memoEditBg">#332D2D</color>
-    <color name="memoEditText">#FFFFFF</color>
-    <color name="memoEditIconBtn">#FFFFFF</color>
+    <color name="memoEditText">#CCFFFFFF</color>
+    <color name="memoEditIconBtn">#CCFFFFFF</color>
     <color name="memoEditLabelBg">#4e4545</color>
     <color name="memoEditLabelRipple">#5c5151</color>
-    <color name="memoEditLabelText">#FFFFFF</color>
+    <color name="memoEditLabelText">#CCFFFFFF</color>
 
     <color name="memoListBg">#332D2D</color>
     <color name="memoListText">#CCFFFFFF</color>
@@ -32,12 +32,11 @@
     <color name="memoItemBg">#4C3638</color>
     <color name="memoItemText">#B3FFFFFF</color>
 
-    <color name="snackbarText">#FFFFFF</color>
+    <color name="snackbarText">#CCFFFFFF</color>
     <color name="snackbarActionText">#552B1E</color>
     <color name="snackbarBg">#AA8073</color>
 
     <color name="searchBtn">#CCFFFFFF</color>
-    <color name="searchEditText">#FFFFFF</color>
     <color name="searchHighLightText">#FF000000</color>
     <color name="searchHighLightTextBg">#F7DE34</color>
 
