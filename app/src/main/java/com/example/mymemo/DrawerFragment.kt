@@ -2,8 +2,6 @@ package com.example.mymemo
 
 import android.app.Dialog
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mymemo.databinding.FragmentDrawerBinding
 import com.example.mymemo.recyclerview_drawer.DrawerAdapter
 import com.example.mymemo.recyclerview_drawer.IDrawerRecyclerView
-import com.example.mymemo.room.MemoEntity
-import com.example.mymemo.util.DialogCreator
 
 
 class DrawerFragment : DialogFragment(), IDrawerRecyclerView {

@@ -312,6 +312,7 @@ class SettingFragment : Fragment() {
                                 "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
                             binding.memoBackupLoading.visibility = View.INVISIBLE
                             binding.touchBlocker.visibility = View.INVISIBLE
+                            isWorking = false
                         }
                     }
                 }
@@ -342,6 +343,7 @@ class SettingFragment : Fragment() {
                                 "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
                             binding.memoRestoreLoading.visibility = View.INVISIBLE
                             binding.touchBlocker.visibility = View.INVISIBLE
+                            isWorking = false
                         }
                     }
                 }
@@ -404,7 +406,6 @@ class SettingFragment : Fragment() {
             e.printStackTrace()
             Toast.makeText(requireContext(), "내보내기 실패", Toast.LENGTH_SHORT).show()
         }
-
     }
 
     // 메모 데이터 파일 가져오기 기능

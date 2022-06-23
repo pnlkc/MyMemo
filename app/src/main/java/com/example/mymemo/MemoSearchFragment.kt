@@ -2,8 +2,6 @@ package com.example.mymemo
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -20,10 +18,10 @@ import com.example.mymemo.recyclerview_memo_search.ISearchRecyclerView
 import com.example.mymemo.recyclerview_memo_search.SearchAdapter
 import com.example.mymemo.room.MemoEntity
 import com.example.mymemo.util.MEMO_TYPE
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class MemoSearchFragment : Fragment(), ISearchRecyclerView {
 
@@ -35,6 +33,9 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
     private val searchAdapter = SearchAdapter(this)
 
     private var filterMemo: MutableList<MemoEntity> = mutableListOf()
+
+    private val myJob = Job()
+    private val myContext get() = Dispatchers.Main + myJob
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,14 +51,25 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
 
         setRecyclerView()
 
-        detectInputTextChanging(binding.searchEditTextClearBtn, binding.searchEditText)
+        CoroutineScope(myContext).launch {
+            launch {
+                binding.mainResultLinearLayout.visibility = View.INVISIBLE
+                delay(200)
+                showKeyboardAndRequestFocus()
+                delay(100)
+                binding.mainResultLinearLayout.visibility = View.VISIBLE
+            }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            binding.mainResultLinearLayout.visibility = View.INVISIBLE
-            delay(200)
-            showKeyboardAndRequestFocus()
-            delay(100)
-            binding.mainResultLinearLayout.visibility = View.VISIBLE
+            // 메모 검색시 검색어 변경이 0.35초 동안 없을시 검색 실행
+            launch {
+                val editTextFlow = binding.searchEditText.textChangesToFlow()
+                editTextFlow
+                    .debounce(350)
+                    .onEach { text ->
+                        searchMemo(text!!, binding.searchEditTextClearBtn, binding.searchEditText)
+                    }
+                    .launchIn(this)
+            }
         }
 
         binding.backButton.setOnClickListener {
@@ -79,53 +91,44 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
         }
     }
 
-    // EditText 값 변경되었을 때 기능
-    private fun detectInputTextChanging(btn: ImageView, editText: EditText) {
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(text: CharSequence, p1: Int, p2: Int, p3: Int) {
-                // 텍스트가 공백이 아니면 메모 검색하기
-                if (text.isNotBlank()) {
-                    filterMemo.clear()
-                    val allMemo = memoViewModel.readAllData.value!!.toMutableList()
-                    allMemo.removeFirst()
-                    allMemo.forEach { memoEntity ->
-                        if (memoEntity.memo.contains(text) || memoEntity.title.contains(text)) {
-                            filterMemo.add(memoEntity)
-                        }
-                    }
-
-                    searchAdapter.setDataNotify(filterMemo, text.toString())
-                } else {
-                    filterMemo.clear()
-                    searchAdapter.setDataNotify(filterMemo, text.toString())
-                }
-
-                // 클리어버튼 및 검색결과 없음 뷰 visibility 설정
-                if (text.isNotEmpty()) {
-                    // 텍스트가 입력되면 클리어버튼 보이기
-                    btn.visibility = View.VISIBLE
-                    btn.setOnClickListener {
-                        editText.text.clear()
-                    }
-                    binding.mainResultLinearLayout.visibility = View.INVISIBLE
-
-                    if (filterMemo.isEmpty()) {
-                        binding.noResultLinearLayout.visibility = View.VISIBLE
-                    } else {
-                        binding.noResultLinearLayout.visibility = View.INVISIBLE
-                    }
-                } else {
-                    btn.visibility = View.INVISIBLE
-                    binding.noResultLinearLayout.visibility = View.INVISIBLE
-                    binding.mainResultLinearLayout.visibility = View.VISIBLE
+    // EditText 값 변경되었을 때 검색 기능
+    private fun searchMemo(text: CharSequence, btn: ImageView, editText: EditText) {
+        // 텍스트가 공백이 아니면 메모 검색하기
+        if (text.isNotBlank()) {
+            filterMemo.clear()
+            val allMemo = memoViewModel.readAllData.value!!.toMutableList()
+            allMemo.removeFirst()
+            allMemo.forEach { memoEntity ->
+                if (memoEntity.memo.contains(text) || memoEntity.title.contains(text)) {
+                    filterMemo.add(memoEntity)
                 }
             }
 
-            override fun afterTextChanged(p0: Editable?) {}
+            searchAdapter.setDataNotify(filterMemo, text.toString())
+        } else {
+            filterMemo.clear()
+            searchAdapter.setDataNotify(filterMemo, text.toString())
+        }
 
-        })
+        // 클리어버튼 및 검색결과 없음 뷰 visibility 설정
+        if (text.isNotEmpty()) {
+            // 텍스트가 입력되면 클리어버튼 보이기
+            btn.visibility = View.VISIBLE
+            btn.setOnClickListener {
+                editText.text.clear()
+            }
+            binding.mainResultLinearLayout.visibility = View.INVISIBLE
+
+            if (filterMemo.isEmpty()) {
+                binding.noResultLinearLayout.visibility = View.VISIBLE
+            } else {
+                binding.noResultLinearLayout.visibility = View.INVISIBLE
+            }
+        } else {
+            btn.visibility = View.INVISIBLE
+            binding.noResultLinearLayout.visibility = View.INVISIBLE
+            binding.mainResultLinearLayout.visibility = View.VISIBLE
+        }
     }
 
     // 키보드 올리고 포커스 주는 기능
@@ -165,5 +168,6 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        myContext.cancel()
     }
 }
