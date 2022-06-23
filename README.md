@@ -1,6 +1,7 @@
 # MyMemo
 간단한 메모앱입니다  
-사용된 폰트는 "Gmarket Sans"입니다. (http://company.gmarket.co.kr/company/about/company/company--font.asp)
+앱에 사용 된 사용된 폰트는 "Gmarket Sans"(http://company.gmarket.co.kr/company/about/company/company--font.asp) 입니다  
+백업 및 복원시 나오는 로딩 애니메이션은 (https://lottiefiles.com/whjxzhwwli) 입니다
 <br>
 
 ### changelog 
