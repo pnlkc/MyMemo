@@ -73,7 +73,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     />
 
-                <com.example.mymemo.util.ClearFocusEditText
+                <com.pnlkc.mymemo.util.ClearFocusEditText
                     android:id="@+id/add_label_edit_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

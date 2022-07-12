@@ -6,7 +6,7 @@
     app:startDestination="@id/memoListFragment">
     <fragment
         android:id="@+id/memoListFragment"
-        android:name="com.example.mymemo.MemoListFragment"
+        android:name="com.pnlkc.mymemo.MemoListFragment"
         android:label="fragment_memo_list"
         tools:layout="@layout/fragment_memo_list" >
         <action
@@ -31,7 +31,7 @@
     </fragment>
     <fragment
         android:id="@+id/memoEditFragment"
-        android:name="com.example.mymemo.MemoEditFragment"
+        android:name="com.pnlkc.mymemo.MemoEditFragment"
         android:label="fragment_memo_edit"
         tools:layout="@layout/fragment_memo_edit" >
         <action
@@ -46,7 +46,7 @@
     </fragment>
     <fragment
         android:id="@+id/memoSearchFragment"
-        android:name="com.example.mymemo.MemoSearchFragment"
+        android:name="com.pnlkc.mymemo.MemoSearchFragment"
         android:label="fragment_memo_search"
         tools:layout="@layout/fragment_memo_search" >
         <action
@@ -60,7 +60,7 @@
     </fragment>
     <dialog
         android:id="@+id/drawerFragment"
-        android:name="com.example.mymemo.DrawerFragment"
+        android:name="com.pnlkc.mymemo.DrawerFragment"
         android:label="fragment_drawer"
         tools:layout="@layout/fragment_drawer" >
         <action
@@ -84,7 +84,7 @@
     </dialog>
     <fragment
         android:id="@+id/selectLabelFragment"
-        android:name="com.example.mymemo.SelectLabelFragment"
+        android:name="com.pnlkc.mymemo.SelectLabelFragment"
         android:label="fragment_select_label"
         tools:layout="@layout/fragment_select_label" >
         <action
@@ -94,7 +94,7 @@
     </fragment>
     <fragment
         android:id="@+id/editLabelFragment"
-        android:name="com.example.mymemo.EditLabelFragment"
+        android:name="com.pnlkc.mymemo.EditLabelFragment"
         android:label="fragment_edit_label"
         tools:layout="@layout/fragment_edit_label" >
         <action
@@ -104,7 +104,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.example.mymemo.SettingFragment"
+        android:name="com.pnlkc.mymemo.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting" >
         <action

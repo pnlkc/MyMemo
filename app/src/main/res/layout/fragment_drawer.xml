@@ -111,13 +111,15 @@
                     android:src="@drawable/label_add_btn_icon" />
 
                 <TextView
-                    android:layout_width="100dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/gmarket_sans_medium"
                     android:text="@string/edit_label"
                     android:textColor="@color/drawer_main_color"
                     android:textSize="15sp"
-                    android:textStyle="italic" />
+                    android:textStyle="italic"
+                    android:maxLines="1"
+                    />
 
             </LinearLayout>
 

@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/search_edit_text" />
 
-    <com.example.mymemo.util.ClearFocusEditText
+    <com.pnlkc.mymemo.util.ClearFocusEditText
         android:id="@+id/search_edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
