@@ -1,6 +1,7 @@
 package com.pnlkc.mymemo
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,6 +19,7 @@ import com.pnlkc.mymemo.databinding.FragmentMemoEditBinding
 import com.pnlkc.mymemo.recyclerview_edit_memo_label.ILabel
 import com.pnlkc.mymemo.recyclerview_edit_memo_label.LabelAdapter
 import com.pnlkc.mymemo.room.MemoEntity
+import com.pnlkc.mymemo.util.ConstData
 import com.pnlkc.mymemo.util.MEMO_TYPE
 import com.pnlkc.mymemo.util.MEMO_TYPE.EDIT
 import com.pnlkc.mymemo.util.MEMO_TYPE.NEW
@@ -70,6 +72,8 @@ class MemoEditFragment : Fragment(), ILabel {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        loadAddTimeBtnSetting()
+
         // 리사이클러뷰 설정
         binding.labelRecyclerView.adapter = labelAdapter
         binding.labelRecyclerView.layoutManager =
@@ -100,7 +104,12 @@ class MemoEditFragment : Fragment(), ILabel {
 
         // 현재 시간 추가 버튼
         binding.timeBtn.setOnClickListener {
-            val timeData = SimpleDateFormat("a hh:mm").format(System.currentTimeMillis())
+            val timeData = when (memoViewModel.addTimeBtnType) {
+                "year" -> SimpleDateFormat("yyyy년 M월 d일 a hh:mm").format(System.currentTimeMillis())
+                "month" -> SimpleDateFormat("M월 d일 a hh:mm").format(System.currentTimeMillis())
+                else -> SimpleDateFormat("a hh:mm").format(System.currentTimeMillis())
+            }
+
             when {
                 binding.memoEditText.hasFocus() -> {
                     binding.memoEditText.text!!.insert(binding.memoEditText.selectionStart,
@@ -110,23 +119,19 @@ class MemoEditFragment : Fragment(), ILabel {
                     binding.memoEditTitle.text!!.insert(binding.memoEditTitle.selectionStart,
                         timeData)
                 }
-                else -> {
-                    binding.memoEditText.append(timeData)
-                }
+                else -> binding.memoEditText.append(timeData)
             }
         }
 
         // 라벨 추가 버튼
-        binding.labelBtn.setOnClickListener {
-            moveSelectLabelFragment()
-        }
+        binding.labelBtn.setOnClickListener { moveSelectLabelFragment() }
     }
 
 
     // 메모가 기존의 메모를 수정하는 것이면 데이터 불러오는 기능
     @SuppressLint("SimpleDateFormat")
     private fun loadMemo(it: MEMO_TYPE) {
-        if (it == MEMO_TYPE.EDIT) {
+        if (it == EDIT) {
             binding.memoEditTitle.setText(memoViewModel.selectedMemo.value!!.title)
             binding.memoEditText.setText(memoViewModel.selectedMemo.value!!.memo)
 
@@ -259,6 +264,16 @@ class MemoEditFragment : Fragment(), ILabel {
 
     override fun labelClicked() {
         moveSelectLabelFragment()
+    }
+
+    // 시간 추가 버튼 설정 불러오기
+    private fun loadAddTimeBtnSetting() {
+        val sharedPreferences =
+            requireActivity().getSharedPreferences(ConstData.KEY_PREFS, Context.MODE_PRIVATE)
+        if (sharedPreferences.contains(ConstData.KEY_ADD_TIME_BTN_SETTING)) {
+            memoViewModel.addTimeBtnType =
+                sharedPreferences.getString(ConstData.KEY_ADD_TIME_BTN_SETTING, "time") ?: "time"
+        }
     }
 
     // 메모 입력후 홈버튼을 눌러 나갔을 때 저장하기 위한 코드

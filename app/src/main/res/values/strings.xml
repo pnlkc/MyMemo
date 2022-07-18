@@ -23,4 +23,16 @@
     <string name="login_google_id_description">구글 아이디로 계정에 로그인합니다.</string>
     <string name="logout_google_id">계정 연동 해제</string>
     <string name="logout_google_id_description">연결된 계정을 로그아웃합니다.</string>
+    <string name="basic_setting">기본 설정</string>
+    <string name="back_up_end_vibration">백업 완료 시 진동</string>
+    <string name="vibration_setting_description">이 설정을 켜면 백업이나 복원 완료시 진동이 울립니다.</string>
+    <string name="local_backup">메모 로컬 백업</string>
+    <string name="cloud_backup">메모 클라우드 백업</string>
+    <string name="backing_up">메모를 백업하고 있습니다</string>
+    <string name="restoring">메모를 복원하고 있습니다</string>
+    <string name="add_time_btn_setting">시간 추가 버튼 설정</string>
+    <string name="add_time_btn_setting_description">메모의 시간 추가 버튼을 설정합니다.\n연도 → OOOO년 O월 O일 오후 OO:OO\n월 → O월 O일 오후 OO:OO\n시간 → 오후 OO:OO</string>
+    <string name="year">연도</string>
+    <string name="month">월</string>
+    <string name="time">시간</string>
 </resources>

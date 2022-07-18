@@ -4,14 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide.init
 import com.pnlkc.mymemo.room.MemoDatabase
 import com.pnlkc.mymemo.room.MemoEntity
 import com.pnlkc.mymemo.room.MemoRepository
 import com.pnlkc.mymemo.util.App
 import com.pnlkc.mymemo.util.MEMO_TYPE
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 // ViewModel이 기본생성자로 Context를 가지기 위해서는
@@ -42,6 +40,9 @@ class MemoViewModel : ViewModel() {
 
     // 메모타입이 New이고 autoSave해서 메모가 추가된 상태인지 확인용
     var memoLastId: Long? = null
+
+    // 시간 추가 버튼 설정 값
+    var addTimeBtnType = "time"
 
     // 위에서 선언한 비어있는 변수를 실제 값들과 연결
     init {

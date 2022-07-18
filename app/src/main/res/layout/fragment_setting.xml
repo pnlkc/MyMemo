@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:fontFamily="@font/gmarket_sans_medium"
-        android:text="설정"
+        android:text="@string/setting"
         android:textColor="@color/setting_main_color"
         android:textSize="17sp"
         app:layout_constraintBottom_toBottomOf="@id/back_button"
@@ -55,7 +55,7 @@
                 android:id="@+id/basic_setting_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="기본 설정"
+                android:text="@string/basic_setting"
                 android:textColor="@color/setting_category_color"
                 android:textSize="13sp"
                 android:textStyle="bold"
@@ -73,6 +73,106 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/basic_setting_textview">
 
+<!--    시간 추가 버튼 설정    -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/add_time_btn_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/memo_local_backup_textview">
+
+                    <TextView
+                        android:id="@+id/add_time_btn_setting_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/gmarket_sans_medium"
+                        android:paddingHorizontal="10dp"
+                        android:paddingTop="10dp"
+                        android:text="@string/add_time_btn_setting"
+                        android:textColor="@color/setting_main_color"
+                        android:textSize="16sp"
+                        app:layout_constraintTop_toTopOf="@id/add_time_btn_radio_group"
+                        app:layout_constraintBottom_toBottomOf="@id/add_time_btn_radio_group"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/add_time_btn_radio_group"
+                        android:paddingBottom="3dp" />
+
+                    <RadioGroup
+                        android:id="@+id/add_time_btn_radio_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/year_radio_btn"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:button="@null"
+                            android:background="@drawable/add_time_btn_radio_btn"
+                            android:text="@string/year"
+                            android:textColor="@drawable/add_time_btn_radio_text"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/gmarket_sans_medium"
+                            android:gravity="center"
+                            android:checked="false"
+                            android:layout_marginEnd="10dp"
+                            />
+
+                        <RadioButton
+                            android:id="@+id/month_radio_btn"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:button="@null"
+                            android:background="@drawable/add_time_btn_radio_btn"
+                            android:text="@string/month"
+                            android:textColor="@drawable/add_time_btn_radio_text"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/gmarket_sans_medium"
+                            android:gravity="center"
+                            android:checked="false"
+                            android:layout_marginEnd="10dp"
+                            />
+
+                        <RadioButton
+                            android:id="@+id/time_radio_btn"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:button="@null"
+                            android:background="@drawable/add_time_btn_radio_btn"
+                            android:text="@string/time"
+                            android:textColor="@drawable/add_time_btn_radio_text"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/gmarket_sans_medium"
+                            android:gravity="center"
+                            android:checked="true" />
+
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:lineSpacingExtra="5sp"
+                        android:paddingHorizontal="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/add_time_btn_setting_description"
+                        android:textColor="@color/setting_description_color"
+                        android:textSize="14sp"
+                        app:layout_constraintTop_toBottomOf="@id/add_time_btn_setting_title"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--    백업 완료 진동 설정    -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/vibration_setting"
                     android:layout_width="match_parent"
@@ -91,7 +191,7 @@
                         android:fontFamily="@font/gmarket_sans_medium"
                         android:paddingHorizontal="10dp"
                         android:paddingTop="10dp"
-                        android:text="백업 완료 시 진동"
+                        android:text="@string/back_up_end_vibration"
                         android:textColor="@color/setting_main_color"
                         android:textSize="16sp"
                         app:layout_constraintTop_toTopOf="parent"
@@ -116,13 +216,14 @@
                         android:paddingHorizontal="10dp"
                         android:paddingTop="5dp"
                         android:paddingBottom="10dp"
-                        android:text="이 설정을 켜면 백업이나 복원 완료시 진동이 울립니다."
+                        android:text="@string/vibration_setting_description"
                         android:textColor="@color/setting_description_color"
                         android:textSize="14sp"
                         app:layout_constraintTop_toBottomOf="@id/vibration_setting_title"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
@@ -133,7 +234,7 @@
                 android:id="@+id/memo_local_backup_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="메모 로컬 백업"
+                android:text="@string/local_backup"
                 android:layout_marginTop="35dp"
                 android:textColor="@color/setting_category_color"
                 android:textSize="13sp"
@@ -217,7 +318,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="35dp"
-                android:text="메모 클라우드 백업"
+                android:text="@string/cloud_backup"
                 android:textColor="@color/setting_category_color"
                 android:textSize="13sp"
                 android:textStyle="bold"
@@ -341,10 +442,11 @@
                         android:layout_height="wrap_content"
                         android:paddingTop="10dp"
                         android:paddingEnd="20dp"
-                        android:text="메모를 백업하고 있습니다"
+                        android:text="@string/backing_up"
                         android:paddingBottom="10dp"
                         android:textColor="@color/setting_main_color"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        tools:ignore="RtlSymmetry" />
 
                 </LinearLayout>
 
@@ -432,15 +534,17 @@
                         android:layout_height="wrap_content"
                         android:paddingTop="10dp"
                         android:paddingEnd="20dp"
-                        android:text="메모를 복원하고 있습니다"
+                        android:text="@string/restoring"
                         android:paddingBottom="10dp"
                         android:textColor="@color/setting_main_color"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        tools:ignore="RtlSymmetry" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
+<!--    터치 방지용 뷰    -->
             <View
                 android:id="@+id/touch_blocker"
                 android:layout_width="0dp"

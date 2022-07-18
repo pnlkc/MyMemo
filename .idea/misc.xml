@@ -7,6 +7,8 @@
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/add_btg_ripple.xml" value="0.168" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/add_btn_bg.xml" value="0.168" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/add_time_btn.xml" value="0.202" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/add_time_btn_radio_btn.xml" value="0.148" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/add_time_btn_radio_text.xml" value="0.148" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/all_memo_icon.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/back_btn.xml" value="0.202" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/drawable/cancel_btn.xml" value="0.202" />
@@ -49,7 +51,7 @@
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_memo_list.xml" value="0.2814814814814815" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_memo_search.xml" value="0.3314814814814815" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_select_label.xml" value="0.3848958333333333" />
-        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_setting.xml" value="0.37777777777777777" />
+        <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/fragment_setting.xml" value="0.378974358974359" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_drawer.xml" value="0.3848958333333333" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_edit_label.xml" value="0.3848958333333333" />
         <entry key="..\:/AndroidStudioProjects-Kotlin/MyMemo/app/src/main/res/layout/item_label.xml" value="0.3848958333333333" />

@@ -53,5 +53,7 @@
     <color name="setting_main_color">#CCDCD9D9</color>
     <color name="setting_category_color">#B58D8F</color>
     <color name="setting_description_color">#CCA8A7A7</color>
+    <color name="setting_add_time_btn_setting_unchecked">#CC797979</color>
+    <color name="setting_add_time_btn_setting_checked">#B58D8F</color>
 
 </resources>

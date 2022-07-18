@@ -19,8 +19,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.res.TypedArrayUtils.getText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -31,6 +29,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.pnlkc.mymemo.databinding.FragmentSettingBinding
 import com.pnlkc.mymemo.room.MemoEntity
 import com.pnlkc.mymemo.util.App
+import com.pnlkc.mymemo.util.ConstData.KEY_ADD_TIME_BTN_SETTING
 import com.pnlkc.mymemo.util.ConstData.KEY_PREFS
 import com.pnlkc.mymemo.util.ConstData.KEY_VIBRATION_SETTING
 import com.pnlkc.mymemo.util.DialogCreator
@@ -97,6 +96,7 @@ class SettingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setVibrationSetting("load")
+        setAddTimeBtnSetting("load")
 
         // 다크모드 감지 코드 -> 다크모드에 따라 로딩 애니메이션 변경
         when (requireContext().resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
@@ -129,9 +129,7 @@ class SettingFragment : Fragment() {
         highAPIPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (isPermissionGranted()) {
-                    requestPermission {
-                        currentAction()
-                    }
+                    requestPermission { currentAction() }
                 } else {
                     Toast.makeText(requireContext(),
                         "이 기능을 실행하려면 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
@@ -150,9 +148,7 @@ class SettingFragment : Fragment() {
 
 
         // 상단의 뒤로가기 화살표 버튼 설정
-        binding.backButton.setOnClickListener {
-            backAction()
-        }
+        binding.backButton.setOnClickListener { backAction() }
 
         // 백업 완료 시 진동 설정
         binding.vibrationSetting.setOnClickListener {
@@ -183,10 +179,7 @@ class SettingFragment : Fragment() {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                 exportLauncher.launch(intent)
             }
-
-            requestPermission {
-                currentAction()
-            }
+            requestPermission { currentAction() }
         }
 
 
@@ -206,10 +199,7 @@ class SettingFragment : Fragment() {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                 importLauncher.launch(intent)
             }
-
-            requestPermission {
-                currentAction()
-            }
+            requestPermission { currentAction() }
         }
 
 
@@ -361,6 +351,15 @@ class SettingFragment : Fragment() {
                 "백업이나 복원이 완료된 다음 다시 시도해주세요", Toast.LENGTH_SHORT).show()
         }
 
+        // 시간 추가 버튼 라디오 그룹 리스너
+        binding.addTimeBtnRadioGroup.setOnCheckedChangeListener { _, id ->
+            when (id) {
+                R.id.year_radio_btn -> memoViewModel.addTimeBtnType = "year"
+                R.id.month_radio_btn -> memoViewModel.addTimeBtnType = "month"
+                R.id.time_radio_btn -> memoViewModel.addTimeBtnType = "time"
+            }
+            setAddTimeBtnSetting("save")
+        }
     }
 
     private fun backAction() {
@@ -732,6 +731,30 @@ class SettingFragment : Fragment() {
                 if (sharedPreferences.contains(KEY_VIBRATION_SETTING)) {
                     isVibrate = sharedPreferences.getBoolean(KEY_VIBRATION_SETTING, true)
                     binding.vibrationSettingSwitch.isChecked = isVibrate
+                }
+            }
+        }
+    }
+
+    // SharedPreferences 사용해서 시간 추가 버튼 설정 저장
+    private fun setAddTimeBtnSetting(mode: String) {
+        val sharedPreferences =
+            requireActivity().getSharedPreferences(KEY_PREFS, Context.MODE_PRIVATE)
+        when (mode) {
+            "save" -> {
+                val editor = sharedPreferences.edit()
+                editor.putString(KEY_ADD_TIME_BTN_SETTING, memoViewModel.addTimeBtnType)
+                editor.apply()
+            }
+            "load" -> {
+                if (sharedPreferences.contains(KEY_ADD_TIME_BTN_SETTING)) {
+                    memoViewModel.addTimeBtnType =
+                        sharedPreferences.getString(KEY_ADD_TIME_BTN_SETTING, "time") ?: "time"
+                    when (memoViewModel.addTimeBtnType) {
+                        "year" -> binding.addTimeBtnRadioGroup.check(R.id.year_radio_btn)
+                        "month" -> binding.addTimeBtnRadioGroup.check(R.id.month_radio_btn)
+                        else -> binding.addTimeBtnRadioGroup.check(R.id.time_radio_btn)
+                    }
                 }
             }
         }
