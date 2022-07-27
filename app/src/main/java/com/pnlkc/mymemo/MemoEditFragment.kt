@@ -105,8 +105,8 @@ class MemoEditFragment : Fragment(), ILabel {
         // 현재 시간 추가 버튼
         binding.timeBtn.setOnClickListener {
             val timeData = when (memoViewModel.addTimeBtnType) {
-                "year" -> SimpleDateFormat("yyyy년 M월 d일 a hh:mm").format(System.currentTimeMillis())
-                "month" -> SimpleDateFormat("M월 d일 a hh:mm").format(System.currentTimeMillis())
+                "year" -> SimpleDateFormat("yyyy년 M월 d일").format(System.currentTimeMillis())
+                "month" -> SimpleDateFormat("M월 d일").format(System.currentTimeMillis())
                 else -> SimpleDateFormat("a hh:mm").format(System.currentTimeMillis())
             }
 

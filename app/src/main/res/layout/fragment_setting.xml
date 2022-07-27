@@ -122,6 +122,7 @@
                             android:gravity="center"
                             android:checked="false"
                             android:layout_marginEnd="10dp"
+                            android:paddingTop="1dp"
                             />
 
                         <RadioButton
@@ -137,6 +138,7 @@
                             android:gravity="center"
                             android:checked="false"
                             android:layout_marginEnd="10dp"
+                            android:paddingTop="1dp"
                             />
 
                         <RadioButton
@@ -150,7 +152,8 @@
                             android:textSize="12sp"
                             android:fontFamily="@font/gmarket_sans_medium"
                             android:gravity="center"
-                            android:checked="true" />
+                            android:checked="true"
+                            android:paddingTop="1dp" />
 
                     </RadioGroup>
 
