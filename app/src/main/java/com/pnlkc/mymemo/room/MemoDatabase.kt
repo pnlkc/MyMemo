@@ -10,6 +10,7 @@ import com.pnlkc.mymemo.util.GsonConverter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 // entities는 사용할 Entitiy를 선언 해주면 됨 []는 배열을 의미
 // version은 Entity 구조 변경시 구분해주는 역할
@@ -43,6 +44,7 @@ abstract class MemoDatabase : RoomDatabase() {
                                         "LabelList",
                                         "",
                                         "00-00-00 오전 00:00",
+                                        Locale.getDefault().language,
                                         mutableListOf())
                                 )
                             }

@@ -156,6 +156,7 @@ class SelectLabelFragment : Fragment(), ISelectLabel {
                 memo.title,
                 memo.memo,
                 memo.date,
+                memo.language,
                 labelList
             )
         )

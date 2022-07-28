@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.*
 
 class MemoEditFragment : Fragment(), ILabel {
 
@@ -137,7 +138,10 @@ class MemoEditFragment : Fragment(), ILabel {
 
             // 메모 시간 기록용 변수
             val dateParsing =
-                SimpleDateFormat("yy-MM-dd a hh:mm").parse(memoViewModel.selectedMemo.value!!.date)
+                SimpleDateFormat(
+                    "yy-MM-dd a hh:mm",
+                    Locale(memoViewModel.selectedMemo.value!!.language)
+                ).parse(memoViewModel.selectedMemo.value!!.date)
             val compareDate = SimpleDateFormat("yyMMdd").format(dateParsing!!)
             val currentDate = SimpleDateFormat("yyMMdd").format(System.currentTimeMillis())
 
@@ -180,11 +184,11 @@ class MemoEditFragment : Fragment(), ILabel {
     fun insertMemo() {
         val currentDateSource = System.currentTimeMillis()
         val memoDate = SimpleDateFormat("yy-MM-dd a hh:mm").format(currentDateSource)
-
         val memo = MemoEntity(null,
             binding.memoEditTitle.text.toString(),
             binding.memoEditText.text.toString(),
             memoDate,
+            Locale.getDefault().language,
             memoViewModel.selectedMemo.value!!.label
         )
 
@@ -196,6 +200,7 @@ class MemoEditFragment : Fragment(), ILabel {
                     memo.title,
                     "",
                     memoDate,
+                    Locale.getDefault().language,
                     memoViewModel.selectedMemo.value!!.label)
                 memoViewModel.addMemo(emptyMemo)
                 Toast.makeText(context, "내용이 입력되지 않았습니다", Toast.LENGTH_SHORT).show()
@@ -204,7 +209,12 @@ class MemoEditFragment : Fragment(), ILabel {
             Toast.makeText(context, "빈 메모입니다", Toast.LENGTH_SHORT).show()
         } else {
             val emptyTitleMemo =
-                MemoEntity(null, "", memo.memo, memoDate, memoViewModel.selectedMemo.value!!.label)
+                MemoEntity(null,
+                    "",
+                    memo.memo,
+                    memoDate,
+                    Locale.getDefault().language,
+                    memoViewModel.selectedMemo.value!!.label)
             memoViewModel.addMemo(emptyTitleMemo)
             Toast.makeText(context, "제목이 입력되지 않았습니다", Toast.LENGTH_SHORT).show()
         }
@@ -225,12 +235,14 @@ class MemoEditFragment : Fragment(), ILabel {
                     binding.memoEditTitle.text.toString(),
                     binding.memoEditText.text.toString(),
                     memoViewModel.selectedMemo.value!!.date,
+                    memoViewModel.selectedMemo.value!!.language,
                     memoViewModel.selectedMemo.value!!.label)
             } else {
                 MemoEntity(memoViewModel.selectedMemo.value!!.id,
                     binding.memoEditTitle.text.toString(),
                     binding.memoEditText.text.toString(),
                     memoDate,
+                    Locale.getDefault().language,
                     memoViewModel.selectedMemo.value!!.label)
             }
 
@@ -243,6 +255,7 @@ class MemoEditFragment : Fragment(), ILabel {
                         memo.title,
                         "",
                         memo.date,
+                        Locale.getDefault().language,
                         memoViewModel.selectedMemo.value!!.label)
                 memoViewModel.editMemo(emptyMemo)
                 Toast.makeText(context, "내용이 입력되지 않았습니다", Toast.LENGTH_SHORT).show()
@@ -256,6 +269,7 @@ class MemoEditFragment : Fragment(), ILabel {
                     "",
                     memo.memo,
                     memo.date,
+                    Locale.getDefault().language,
                     memoViewModel.selectedMemo.value!!.label)
             memoViewModel.editMemo(emptyTitleMemo)
             Toast.makeText(context, "제목이 입력되지 않았습니다", Toast.LENGTH_SHORT).show()

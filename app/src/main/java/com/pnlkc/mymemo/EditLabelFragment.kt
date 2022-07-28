@@ -179,6 +179,7 @@ class EditLabelFragment : Fragment(), IEditLabel {
                 memo.title,
                 memo.memo,
                 memo.date,
+                memo.language,
                 labelList
             )
         )
