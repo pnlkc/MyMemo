@@ -64,9 +64,21 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
             launch {
                 val editTextFlow = binding.searchEditText.textChangesToFlow()
                 editTextFlow
+                    .onEach { text ->
+                        // 클리어버튼 및 검색결과 없음 뷰 visibility 설정
+                        if (text!!.isNotEmpty()) {
+                            // 텍스트가 입력되면 클리어버튼 보이기
+                            binding.searchEditTextClearBtn.visibility = View.VISIBLE
+                            binding.searchEditTextClearBtn.setOnClickListener {
+                                binding.searchEditText.text!!.clear()
+                            }
+                        } else {
+                            binding.searchEditTextClearBtn.visibility = View.INVISIBLE
+                        }
+                    }
                     .debounce(350)
                     .onEach { text ->
-                        searchMemo(text!!, binding.searchEditTextClearBtn, binding.searchEditText)
+                        searchMemo(text!!)
                     }
                     .launchIn(this)
             }
@@ -92,7 +104,7 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
     }
 
     // EditText 값 변경되었을 때 검색 기능
-    private fun searchMemo(text: CharSequence, btn: ImageView, editText: EditText) {
+    private fun searchMemo(text: CharSequence) {
         // 텍스트가 공백이 아니면 메모 검색하기
         if (text.isNotBlank()) {
             filterMemo.clear()
@@ -104,19 +116,6 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
                 }
             }
 
-            searchAdapter.setDataNotify(filterMemo, text.toString())
-        } else {
-            filterMemo.clear()
-            searchAdapter.setDataNotify(filterMemo, text.toString())
-        }
-
-        // 클리어버튼 및 검색결과 없음 뷰 visibility 설정
-        if (text.isNotEmpty()) {
-            // 텍스트가 입력되면 클리어버튼 보이기
-            btn.visibility = View.VISIBLE
-            btn.setOnClickListener {
-                editText.text.clear()
-            }
             binding.mainResultLinearLayout.visibility = View.INVISIBLE
 
             if (filterMemo.isEmpty()) {
@@ -124,10 +123,13 @@ class MemoSearchFragment : Fragment(), ISearchRecyclerView {
             } else {
                 binding.noResultLinearLayout.visibility = View.INVISIBLE
             }
+
+            searchAdapter.setDataNotify(filterMemo, text.toString())
         } else {
-            btn.visibility = View.INVISIBLE
             binding.noResultLinearLayout.visibility = View.INVISIBLE
             binding.mainResultLinearLayout.visibility = View.VISIBLE
+            filterMemo.clear()
+            searchAdapter.setDataNotify(filterMemo, text.toString())
         }
     }
 

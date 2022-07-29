@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/gmarket_sans_medium"
             android:gravity="center"
-            android:text="검색어를 입력하세요"
+            android:text="@string/input_search_term"
             android:layout_marginTop="20dp"
             android:textColor="@color/memoEditText"
             android:textSize="15sp" />

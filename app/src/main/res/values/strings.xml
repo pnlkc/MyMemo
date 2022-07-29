@@ -35,4 +35,5 @@
     <string name="year">연도</string>
     <string name="month">월</string>
     <string name="time">시간</string>
+    <string name="input_search_term">검색어를 입력하세요</string>
 </resources>
