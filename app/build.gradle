@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.pnlkc.mymemo"
         minSdk 26
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -42,7 +42,7 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -64,7 +64,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-rc01'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.0-rc01'
     // 아래 두개는 viewModel 초기화 때 by viewModels 사용하려면 필요
-    implementation 'androidx.fragment:fragment-ktx:1.4.1'
+    implementation 'androidx.fragment:fragment-ktx:1.5.5'
     implementation 'androidx.activity:activity-ktx:1.4.0'
 
     // JetPack의 Navigation
@@ -92,10 +92,13 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
     // 파이어베이스 Authentication 기능을 사용하기 위해 필요
-    implementation('com.google.firebase:firebase-auth-ktx')
+    implementation('com.google.firebase:firebase-auth-ktx') {
+        // 구글 플레이 콘솔 에러 대응 : 다음 SDK 버전에서 심각한 문제가 보고되었습니다.
+        exclude module: "play-services-safetynet"
+    }
 
     // 파이어베이스 구글 인증을 사용하기 위해 필요
-    implementation('com.google.android.gms:play-services-auth:20.2.0')
+    implementation('com.google.android.gms:play-services-auth:20.4.0')
 
     // FirebaseAuth를 전역으로 설정할때 MultiDexApplication()을 상속받기 위해 필요
     implementation('androidx.multidex:multidex:2.0.1')
