@@ -1,7 +1,7 @@
 # MyMemo
 간단한 메모앱입니다
 
-- Andorid Jetpack - room database를 사용하여 메모 저장  
+- Android Jetpack - room database를 사용하여 메모 저장  
 - CollapsingToolbarLayout을 사용하여 스크롤 정도에 따른 레이아웃 구현  
 - Firebase - Authentication을 사용하여 구글 로그인 기능 제공  
 - Firebase - Storage를 사용하여 메모 클라우드 백업 기능 구현  
