@@ -1,5 +1,13 @@
 # MyMemo
-간단한 메모앱입니다  
+간단한 메모앱입니다
+
+- Andorid Jetpack - room database를 사용하여 메모 저장  
+- CollapsingToolbarLayout을 사용하여 스크롤 정도에 따른 레이아웃 구현  
+- Firebase - Authentication을 사용하여 구글 로그인 기능 제공  
+- Firebase - Storage를 사용하여 메모 클라우드 백업 기능 구현  
+- MediaStore 기능을 사용하여 로컬 백업 기능 구현 (안드로이드 버전에 따른 대응)  
+- 코루틴을 사용하여 메모 클라우드 백업시 기능 최적화
+
 앱에 사용 된 사용된 폰트는 "Gmarket Sans"(http://company.gmarket.co.kr/company/about/company/company--font.asp) 입니다  
 백업 및 복원시 나오는 로딩 애니메이션은 (https://lottiefiles.com/whjxzhwwli) 입니다
 <br>
