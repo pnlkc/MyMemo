@@ -2,13 +2,14 @@ package com.pnlkc.mymemo
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.*
-import android.provider.Settings
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +18,8 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -27,7 +28,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.pnlkc.mymemo.databinding.FragmentSettingBinding
-import com.pnlkc.mymemo.room.MemoEntity
 import com.pnlkc.mymemo.util.App
 import com.pnlkc.mymemo.util.ConstData.KEY_ADD_TIME_BTN_SETTING
 import com.pnlkc.mymemo.util.ConstData.KEY_PREFS
@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import kotlin.system.exitProcess
 
 class SettingFragment : Fragment() {
 
@@ -65,10 +66,9 @@ class SettingFragment : Fragment() {
     // 백업이나 복원 작업 완료 시 진동 유무 설정용 변수
     private var isVibrate = true
 
-    // API 30 이상 퍼미션 런처
-    private lateinit var highAPIPermissionLauncher: ActivityResultLauncher<Intent>
     // API 30 미만 퍼미션 런처
     private lateinit var lowAPIPermissionLauncher: ActivityResultLauncher<Array<String>>
+
     // 백업 및 복원시 최초 권한 획득 후, 기존의 작업을 자동으로 실행하기 위한 변수
     private lateinit var currentAction: () -> Unit
 
@@ -126,26 +126,17 @@ class SettingFragment : Fragment() {
             }
         }
 
-        highAPIPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (isPermissionGranted()) {
-                    requestPermission { currentAction() }
-                } else {
-                    Toast.makeText(requireContext(),
-                        "이 기능을 실행하려면 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-                }
-            }
+
 
         lowAPIPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                 if (it.values.contains(false)) {
-                    Toast.makeText(requireContext(),
-                        "이 기능을 실행하려면 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "이 기능을 실행하려면 권한이 필요합니다.", Toast.LENGTH_SHORT)
+                        .show()
                 } else {
                     currentAction()
                 }
             }
-
 
         // 상단의 뒤로가기 화살표 버튼 설정
         binding.backButton.setOnClickListener { backAction() }
@@ -164,42 +155,14 @@ class SettingFragment : Fragment() {
         }
 
         // 메모 내보내기(로컬) 기능
-        val exportLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == AppCompatActivity.RESULT_OK) {
-                    val resultData = it.data?.data?.path.toString()
-                    val index = resultData.indexOf(":")
-                    val path = resultData.removeRange(0..index)
-                    exportDatabase(path)
-                }
-            }
-
         binding.memoExport.setOnClickListener {
-            currentAction = {
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                exportLauncher.launch(intent)
-            }
-            requestPermission { currentAction() }
+            requestPermission { exportDatabase() }
         }
 
 
         // 메모 가져오기(로컬) 기능
-        val importLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == AppCompatActivity.RESULT_OK) {
-                    val resultData = it.data?.data?.path.toString()
-                    val index = resultData.indexOf(":")
-                    val path = resultData.removeRange(0..index)
-                    importDatabase(path)
-                }
-            }
-
         binding.memoImport.setOnClickListener {
-            currentAction = {
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                importLauncher.launch(intent)
-            }
-            requestPermission { currentAction() }
+            requestPermission { importDatabase() }
         }
 
 
@@ -220,8 +183,7 @@ class SettingFragment : Fragment() {
 
                                     Toast.makeText(requireContext(),
                                         "연동에 성공하였습니다",
-                                        Toast.LENGTH_SHORT)
-                                        .show()
+                                        Toast.LENGTH_SHORT).show()
 
                                     binding.loginGoogleIdTitle.text =
                                         getText(R.string.logout_google_id)
@@ -231,8 +193,7 @@ class SettingFragment : Fragment() {
                                     // 구글 로그인 실패
                                     Toast.makeText(requireContext(),
                                         "연동에 실패하였습니다",
-                                        Toast.LENGTH_SHORT)
-                                        .show()
+                                        Toast.LENGTH_SHORT).show()
                                 }
                             }
                     } catch (e: ApiException) {
@@ -245,23 +206,19 @@ class SettingFragment : Fragment() {
             when (App.checkAuth()) {
                 // 로그인 되어 있으면
                 true -> {
-                    DialogCreator().showDialog(
-                        requireContext(),
+                    DialogCreator().showDialog(requireContext(),
                         getString(R.string.app_name),
-                        "이 앱과 연결된 계정을 로그아웃하시겠습니까?"
-                    ) {
+                        "이 앱과 연결된 계정을 로그아웃하시겠습니까?") {
                         // 파이어베이스 로그아아웃
                         App.auth.signOut()
 
                         // 구글 계정 로그아웃
                         // 이 코드가 없으면 재로그인시 초기 로그인시 나오는 인텐트 팝업이 뜨지 않음
-                        GoogleSignIn.getClient(
-                            requireContext(),
-                            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
-                        ).signOut()
+                        GoogleSignIn.getClient(requireContext(),
+                            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .build()).signOut()
 
-                        Toast.makeText(requireContext(),
-                            "연동이 해제 되었습니다", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "연동이 해제 되었습니다", Toast.LENGTH_SHORT).show()
 
                         binding.loginGoogleIdTitle.text = getText(R.string.login_google_id)
                         binding.loginGoogleIdDescription.text =
@@ -270,12 +227,10 @@ class SettingFragment : Fragment() {
                 }
                 // 로그인 되어있지 않으면
                 false -> {
-                    val gso = GoogleSignInOptions
-                        .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         //R.string.default_web_client_id 에러시
                         // project 수준의 classpath ...google-services:4.3.8 로 변경
-                        .requestIdToken(getString(R.string.default_web_client_id))
-                        .requestEmail()
+                        .requestIdToken(getString(R.string.default_web_client_id)).requestEmail()
                         .build()
                     val signInIntent = GoogleSignIn.getClient(requireContext(), gso).signInIntent
                     gsoLauncher.launch(signInIntent)
@@ -286,11 +241,9 @@ class SettingFragment : Fragment() {
 
         // 메모 백업(클라우드) 기능
         binding.memoBackup.setOnClickListener {
-            DialogCreator().showDialog(
-                requireContext(),
+            DialogCreator().showDialog(requireContext(),
                 getString(R.string.app_name),
-                "메모를 백업하시겠습니까?"
-            ) {
+                "메모를 백업하시겠습니까?") {
                 currentAction = {
                     binding.memoBackupLoading.visibility = View.VISIBLE
                     binding.touchBlocker.visibility = View.VISIBLE
@@ -300,8 +253,8 @@ class SettingFragment : Fragment() {
                             uploadMemoData()
                         }
                         false -> {
-                            Toast.makeText(requireContext(),
-                                "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT)
+                                .show()
                             binding.memoBackupLoading.visibility = View.INVISIBLE
                             binding.touchBlocker.visibility = View.INVISIBLE
                             isWorking = false
@@ -317,11 +270,9 @@ class SettingFragment : Fragment() {
 
         // 메모 복원(클라우드) 기능
         binding.memoRestore.setOnClickListener {
-            DialogCreator().showDialog(
-                requireContext(),
+            DialogCreator().showDialog(requireContext(),
                 getString(R.string.app_name),
-                "메모를 복원하시겠습니까?"
-            ) {
+                "메모를 복원하시겠습니까?") {
                 currentAction = {
                     binding.memoRestoreLoading.visibility = View.VISIBLE
                     binding.touchBlocker.visibility = View.VISIBLE
@@ -331,8 +282,8 @@ class SettingFragment : Fragment() {
                             downloadMemoData()
                         }
                         false -> {
-                            Toast.makeText(requireContext(),
-                                "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "계정 연동이 되어있지 않습니다", Toast.LENGTH_SHORT)
+                                .show()
                             binding.memoRestoreLoading.visibility = View.INVISIBLE
                             binding.touchBlocker.visibility = View.INVISIBLE
                             isWorking = false
@@ -347,8 +298,7 @@ class SettingFragment : Fragment() {
         }
 
         binding.touchBlocker.setOnClickListener {
-            Toast.makeText(requireContext(),
-                "백업이나 복원이 완료된 다음 다시 시도해주세요", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "백업이나 복원이 완료된 다음 다시 시도해주세요", Toast.LENGTH_SHORT).show()
         }
 
         // 시간 추가 버튼 라디오 그룹 리스너
@@ -365,135 +315,124 @@ class SettingFragment : Fragment() {
     private fun backAction() {
         when (isWorking) {
             true -> Toast.makeText(requireContext(),
-                "백업이나 복원이 완료된 다음 화면을 이동해주세요", Toast.LENGTH_SHORT).show()
+                "백업이나 복원이 완료된 다음 화면을 이동해주세요",
+                Toast.LENGTH_SHORT).show()
             false -> removeFragment()
         }
     }
 
     // 메모 데이터 파일 내보내기 기능
-    private fun exportDatabase(path: String) {
-        try {
-            val sd = Environment.getExternalStorageDirectory()
-            val data = Environment.getDataDirectory()
+    private fun exportDatabase() {
+        val dbName = "memo.db"
+        val currentDB = requireContext().getDatabasePath(dbName).absolutePath
+        val currentSHM = requireContext().getDatabasePath("$dbName-shm").absolutePath
+        val currentWAL = requireContext().getDatabasePath("$dbName-wal").absolutePath
 
-            if (sd!!.canWrite()) {
-                val currentDB = File(data, "/data/com.pnlkc.mymemo/databases/memo.db")
-                val currentSHM = File(data, "/data/com.pnlkc.mymemo/databases/memo.db-shm")
-                val currentWAl = File(data, "/data/com.pnlkc.mymemo/databases/memo.db-wal")
-                val exportDB = File(sd, "/$path/memo.db")
-                val exportSHM = File(sd, "/$path/memo.db-shm")
-                val exportWAL = File(sd, "/$path/memo.db-wal")
-
-                // original 파일을 overwrite 파일에 덮어씌우는 기능
-                val dataStream = { original: File, overwrite: File ->
-                    val inputStream = FileInputStream(original).channel
-                    val outputStream = FileOutputStream(overwrite).channel
-                    outputStream.transferFrom(inputStream, 0, inputStream.size())
-                    inputStream.close()
-                    outputStream.close()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val import : (String, String) -> Unit = { name, path ->
+                val contentResolver = requireActivity().contentResolver
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, name)
+                    put(MediaStore.Downloads.MIME_TYPE, "application/vnd.sqlite3")
+                    put(MediaStore.Downloads.IS_PENDING, 1)
                 }
 
-                dataStream(currentDB, exportDB)
-                dataStream(currentSHM, exportSHM)
-                dataStream(currentWAl, exportWAL)
+                val collection =
+                    MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                val item = contentResolver.insert(collection, values)!!
 
-                Toast.makeText(requireContext(), "내보내기 성공", Toast.LENGTH_SHORT).show()
+                contentResolver.openFileDescriptor(item, "w", null).use {
+                    FileOutputStream(it!!.fileDescriptor).use { outputStream ->
+                        val inputStream = FileInputStream(File(path))
+                        while (true) {
+                            val data = inputStream.read()
+                            if (data == -1) break
+                            outputStream.write(data)
+                        }
+                        inputStream.close()
+                        outputStream.close()
+                    }
+                }
 
-                makeVibration()
-            } else {
-                Log.d("로그", "SettingFragment - exportDatabase() 권한 오류")
+                values.clear()
+                values.put(MediaStore.Downloads.IS_PENDING, 0)
+                contentResolver.update(item, values, null, null)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(requireContext(), "내보내기 실패", Toast.LENGTH_SHORT).show()
+
+            import(dbName, currentDB)
+            import("$dbName-wal", currentWAL)
+            import("$dbName-shm", currentSHM)
+
+            Toast.makeText(requireContext(), "내보내기 성공", Toast.LENGTH_SHORT).show()
+
+            makeVibration()
+        } else {
+            val import : (String, String) -> Unit = { name, path ->
+                val contentResolver = requireActivity().contentResolver
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, name)
+                    put(MediaStore.Downloads.MIME_TYPE, "application/vnd.sqlite3")
+                    put(MediaStore.Downloads.DATA, path)
+                }
+                contentResolver.insert(Environment.DIRECTORY_DOWNLOADS.toUri(), values)!!
+            }
+
+            import(dbName, currentDB)
+            import("$dbName-wal", currentWAL)
+            import("$dbName-shm", currentSHM)
+
+            Toast.makeText(requireContext(), "내보내기 성공", Toast.LENGTH_SHORT).show()
+
+            makeVibration()
         }
     }
 
     // 메모 데이터 파일 가져오기 기능
-    private fun importDatabase(path: String) {
-        try {
-            val sd = Environment.getExternalStorageDirectory()
-            val data = Environment.getDataDirectory()
+    private fun importDatabase() {
+        val dbName = "memo.db"
+        val directory =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
-            if (sd!!.canWrite()) {
-                val currentDB = File(data, "/data/com.pnlkc.mymemo/databases/memo.db")
-                val currentSHM = File(data, "/data/com.pnlkc.mymemo/databases/memo.db-shm")
-                val currentWAl = File(data, "/data/com.pnlkc.mymemo/databases/memo.db-wal")
-                val importDB = File(sd, "/$path/memo.db")
-                val importSHM = File(sd, "/$path/memo.db-shm")
-                val importWAL = File(sd, "/$path/memo.db-wal")
+        val importDB = "$directory/$dbName"
+        val importSHM = "$directory/$dbName-shm"
+        val importWAL = "$directory/$dbName-wal"
+        val currentDB = requireContext().getDatabasePath(dbName).absolutePath
+        val currentSHM = requireContext().getDatabasePath("$dbName-shm").absolutePath
+        val currentWAL = requireContext().getDatabasePath("$dbName-wal").absolutePath
+        File(importDB).copyTo(File(currentDB), true)
+        File(importSHM).copyTo(File(currentSHM), true)
+        File(importWAL).copyTo(File(currentWAL), true)
 
-                // original 파일을 overwrite 파일에 덮어씌우는 기능
-                val dataStream = { original: File, overwrite: File ->
-                    val inputStream = FileInputStream(original).channel
-                    val outputStream = FileOutputStream(overwrite).channel
-                    outputStream.transferFrom(inputStream, 0, inputStream.size())
-                    inputStream.close()
-                    outputStream.close()
-                }
+        Toast.makeText(requireContext(), "가져오기 성공", Toast.LENGTH_SHORT).show()
 
-                dataStream(importDB, currentDB)
-                dataStream(importSHM, currentSHM)
-                dataStream(importWAL, currentWAl)
+        makeVibration()
 
-                // MemoListFragment 리사이클러뷰 리프레시 (딜레이가 없으면 에러 발생)
-                memoViewModel.addMemo(MemoEntity(-1))
-                Handler(Looper.getMainLooper()).postDelayed({
-                    memoViewModel.deleteMemo(MemoEntity(-1))
-                }, 35)
-                memoViewModel.selectedLabel.value = null
-
-                Toast.makeText(requireContext(), "가져오기 성공", Toast.LENGTH_SHORT).show()
-
-                makeVibration()
-            } else {
-                Log.d("로그", "SettingFragment - importDatabase() 권한 오류")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(requireContext(), "가져오기 실패", Toast.LENGTH_SHORT).show()
-        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            requireActivity().finishAffinity()
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+            exitProcess(0)
+        }, 100)
     }
 
     // 외부 저장소 쓰기권한 요청 기능
-    // 안드로이드 API 30 이상과 미만에 따른 권한 요청 방법 구분
+    // 안드로이드 API 30 미만 버전은 권한 요청 필요
     private fun requestPermission(action: () -> Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!isPermissionGranted()) {
-                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                val uri = Uri.fromParts("package", requireContext().packageName, null)
-                intent.data = uri
-                highAPIPermissionLauncher.launch(intent)
-            } else {
-                action()
-            }
+            action()
         } else {
             if (ActivityCompat.checkSelfPermission(requireContext(),
-                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+                    requireContext(),
                     Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
             ) {
-                val permission = arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                )
+                val permission = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 lowAPIPermissionLauncher.launch(permission)
             } else {
                 action()
             }
         }
-    }
-
-
-    // MANAGE_EXTERNAL_STORAGE 권한 확인
-    private fun isPermissionGranted(): Boolean {
-        var granted = false
-        try {
-            granted = Environment.isExternalStorageManager()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return granted
     }
 
     private fun removeFragment() {
@@ -509,7 +448,7 @@ class SettingFragment : Fragment() {
         val data = Environment.getDataDirectory()
         val currentDB = Uri.fromFile(File(data, "/data/com.pnlkc.mymemo/databases/memo.db"))
         val currentSHM = Uri.fromFile(File(data, "/data/com.pnlkc.mymemo/databases/memo.db-shm"))
-        val currentWAl = Uri.fromFile(File(data, "/data/com.pnlkc.mymemo/databases/memo.db-wal"))
+        val currentWAL = Uri.fromFile(File(data, "/data/com.pnlkc.mymemo/databases/memo.db-wal"))
 
         CoroutineScope(Dispatchers.IO).launch {
             launch {
@@ -535,8 +474,8 @@ class SettingFragment : Fragment() {
             }
 
             launch {
-                val uploadTaskWAl = memoDataRef.child("memo.db-wal").putFile(currentWAl)
-                uploadTaskWAl.addOnSuccessListener {
+                val uploadTaskWAL = memoDataRef.child("memo.db-wal").putFile(currentWAL)
+                uploadTaskWAL.addOnSuccessListener {
                     uploadResultList.add(true)
                     Log.d("로그", "uploadTaskWAl 업로드 성공")
                 }.addOnFailureListener {
@@ -602,46 +541,40 @@ class SettingFragment : Fragment() {
         CoroutineScope(Dispatchers.IO).launch {
             launch(Dispatchers.IO) {
                 val downloadTaskDB = File.createTempFile("memoData", "memo.db")
-                memoDataRef.child("memo.db").getFile(downloadTaskDB)
-                    .addOnSuccessListener {
-                        Log.d("로그", "downloadTaskDB 다운로드 성공")
-                        downloadDB = File(downloadTaskDB.absolutePath)
-                        downloadResultList.add(true)
-                    }
-                    .addOnFailureListener {
-                        Log.d("로그", "downloadTaskDB 다운로드 실패")
-                        downloadResultList.add(false)
-                    }
+                memoDataRef.child("memo.db").getFile(downloadTaskDB).addOnSuccessListener {
+                    Log.d("로그", "downloadTaskDB 다운로드 성공")
+                    downloadDB = File(downloadTaskDB.absolutePath)
+                    downloadResultList.add(true)
+                }.addOnFailureListener {
+                    Log.d("로그", "downloadTaskDB 다운로드 실패")
+                    downloadResultList.add(false)
+                }
                 downloadTaskDB.deleteOnExit()
             }
 
             launch(Dispatchers.IO) {
                 val downloadTaskSHM = File.createTempFile("memoData", "memo.db-shm")
-                memoDataRef.child("memo.db-shm").getFile(downloadTaskSHM)
-                    .addOnSuccessListener {
-                        Log.d("로그", "downloadTaskSHM 다운로드 성공")
-                        downloadSHM = File(downloadTaskSHM.absolutePath)
-                        downloadResultList.add(true)
-                    }
-                    .addOnFailureListener {
-                        Log.d("로그", "downloadTaskSHM 다운로드 실패")
-                        downloadResultList.add(false)
-                    }
+                memoDataRef.child("memo.db-shm").getFile(downloadTaskSHM).addOnSuccessListener {
+                    Log.d("로그", "downloadTaskSHM 다운로드 성공")
+                    downloadSHM = File(downloadTaskSHM.absolutePath)
+                    downloadResultList.add(true)
+                }.addOnFailureListener {
+                    Log.d("로그", "downloadTaskSHM 다운로드 실패")
+                    downloadResultList.add(false)
+                }
                 downloadTaskSHM.deleteOnExit()
             }
 
             launch(Dispatchers.IO) {
                 val downloadTaskWAL = File.createTempFile("memoData", "memo.db-wal")
-                memoDataRef.child("memo.db-wal").getFile(downloadTaskWAL)
-                    .addOnSuccessListener {
-                        Log.d("로그", "downloadTaskWAL 다운로드 성공")
-                        downloadWAL = File(downloadTaskWAL.absolutePath)
-                        downloadResultList.add(true)
-                    }
-                    .addOnFailureListener {
-                        Log.d("로그", "downloadTaskWAL 다운로드 실패")
-                        downloadResultList.add(false)
-                    }
+                memoDataRef.child("memo.db-wal").getFile(downloadTaskWAL).addOnSuccessListener {
+                    Log.d("로그", "downloadTaskWAL 다운로드 성공")
+                    downloadWAL = File(downloadTaskWAL.absolutePath)
+                    downloadResultList.add(true)
+                }.addOnFailureListener {
+                    Log.d("로그", "downloadTaskWAL 다운로드 실패")
+                    downloadResultList.add(false)
+                }
                 downloadTaskWAL.deleteOnExit()
             }
         }
@@ -651,49 +584,23 @@ class SettingFragment : Fragment() {
 
     // 복원 파일이 다운로드가 완료되면 메모 복원하는 기능
     private fun restoreMemoData(importDB: File, importSHM: File, importWAL: File) {
-        try {
-            val sd = Environment.getExternalStorageDirectory()
-            val data = Environment.getDataDirectory()
+        val dbName = "memo.db"
+        val currentDB = requireContext().getDatabasePath(dbName).absolutePath
+        val currentSHM = requireContext().getDatabasePath("$dbName-shm").absolutePath
+        val currentWAL = requireContext().getDatabasePath("$dbName-wal").absolutePath
+        importDB.copyTo(File(currentDB), true)
+        importSHM.copyTo(File(currentSHM), true)
+        importWAL.copyTo(File(currentWAL), true)
 
-            if (sd!!.canWrite()) {
-                val currentDB = File(data, "/data/com.pnlkc.mymemo/databases/memo.db")
-                val currentSHM = File(data, "/data/com.pnlkc.mymemo/databases/memo.db-shm")
-                val currentWAl = File(data, "/data/com.pnlkc.mymemo/databases/memo.db-wal")
-
-                val dataStream = { original: File, overwrite: File ->
-                    val inputStream = FileInputStream(original).channel
-                    val outputStream = FileOutputStream(overwrite).channel
-                    outputStream.transferFrom(inputStream, 0, inputStream.size())
-                    inputStream.close()
-                    outputStream.close()
-                }
-
-                dataStream(importDB, currentDB)
-                dataStream(importSHM, currentSHM)
-                dataStream(importWAL, currentWAl)
-
-                // MemoListFragment 리사이클러뷰 리프레시 (딜레이가 없으면 에러 발생)
-                memoViewModel.addMemo(MemoEntity(-1))
-                Handler(Looper.getMainLooper()).postDelayed({
-                    memoViewModel.deleteMemo(MemoEntity(-1))
-                }, 35)
-
-                memoViewModel.selectedLabel.value = null
-
-                Toast.makeText(requireContext(), "복원 성공", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.d("로그", "SettingFragment - restoreMemoData() 권한 오류")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(requireContext(), "복원 실패", Toast.LENGTH_SHORT).show()
-        }
-
-        // 복원 완료 후
-        binding.memoRestoreLoading.visibility = View.INVISIBLE
-        binding.touchBlocker.visibility = View.INVISIBLE
-        isWorking = false
+        Toast.makeText(requireContext(), "복원 성공", Toast.LENGTH_SHORT).show()
         makeVibration()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            requireActivity().finishAffinity()
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+            exitProcess(0)
+        }, 100)
     }
 
     // 진동 1회 발생
@@ -707,8 +614,7 @@ class SettingFragment : Fragment() {
                 val combinedVibration = CombinedVibration.createParallel(vibrationEffect)
                 vibrator.vibrate(combinedVibration)
             } else {
-                @Suppress("DEPRECATION")
-                val vibrator =
+                @Suppress("DEPRECATION") val vibrator =
                     requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
                 val vibrationEffect =
                     VibrationEffect.createOneShot(100L, VibrationEffect.DEFAULT_AMPLITUDE)
