@@ -65,7 +65,7 @@
 >메모 수정 화면(프래그먼트)에서 EditText의 힌트를 제목/메모 에서 제목/내용으로 변경 
 
 ***ver 1.9.3***
->스마트폰 언어 변경시 기존  SimpleTimeFormat().parse()할 때 오류 생기는 문제 해결
+>스마트폰 언어 변경시 기존  SimpleTimeFormat().parse()할 때 오류 생기는 문제 해결  
 > => 메모 시간 저장시 `Locale.getDefault().language`로 언어 설정도 같이 저장 후 불러오도록 수정
 
 ***ver 1.9.5***
